@@ -7,8 +7,17 @@ connectDB();
 const app = express();
 
 app.get('/', async (req, res) => {
-    res.send('API is running');
+    console.log('API is running');
 });
+
+
+// Define routes
+app.use('/api/users', require('./routes/api/users'));
+
+
+
+
+
 
 const PORT = process.env.PORT || 5000;
 
