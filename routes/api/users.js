@@ -71,8 +71,17 @@ router.post('/', [
 
         await user.save();
 
+        // Get the token
+        const payload = {
+            user: {
+                id: user.id
+            }
+        }
 
-
+        jwt.sign(payload, config.get('jwtSecret'), { expiresIn: 36000000 }, (err, token) => {
+            if (err) throw err;
+            res.json({ token });
+        })
 
 
     } catch (error) {
