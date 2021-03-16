@@ -1,6 +1,13 @@
 const express = require('express');
 const { check, validationResult } = require('express-validator/check');
 const config = require('config');
+const gravatar = require('gravatar');
+const bcrypt = require('bcryptjs');
+const saltRounds = 10;
+const jwt = require('jsonwebtoken');
+
+
+
 const User = require('../../models/User');
 
 
@@ -29,7 +36,49 @@ router.post('/', [
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    res.send('User is valid ');
+
+    const { name, email, password } = req.body;
+
+    try {
+
+        // Check user if already exist 
+        let user = await User.findOne({ email });
+
+        if (user) {
+            res.status(400).json({ errors: [{ message: 'User already exists' }] });
+        }
+
+        // Get user avatar
+        const avatar = gravatar.url(email, {
+            s: '200',
+            r: 'pg',
+            d: 'mm'
+        })
+
+        // This doesn't create the user it just create an inctance of it (we have to implement the .save();)
+        user = new User({
+            name,
+            email,
+            avatar,
+            password
+        });
+
+        // Password encryption
+        const salt = await bcrypt.genSalt(saltRounds);
+
+        // I added the toString() otherwise it didn't work thanks to : https://github.com/bradtraversy/nodeauthapp/issues/7
+        user.password = await bcrypt.hash(password.toString(), salt);
+
+        await user.save();
+
+
+
+
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server error');
+    }
 });
 
 
