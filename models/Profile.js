@@ -22,6 +22,9 @@ const ProfileSchema = new mongoose.Schema({
         type: [String],
         required: true
     },
+    intrests: {
+        type: [String]
+    },
     bio: {
         type: String
     },
@@ -29,6 +32,35 @@ const ProfileSchema = new mongoose.Schema({
         type: String
     },
     experience: [
+        {
+            title: {
+                type: String,
+                required: true
+            },
+            company: {
+                type: String,
+                required: true
+            },
+            location: {
+                type: String
+            },
+            from: {
+                type: Date,
+                required: true
+            },
+            to: {
+                type: Date
+            },
+            current: {
+                type: Boolean,
+                default: false
+            },
+            description: {
+                type: String
+            }
+        }
+    ],
+    Volunteer: [
         {
             title: {
                 type: String,
@@ -88,6 +120,33 @@ const ProfileSchema = new mongoose.Schema({
             }
         }
     ],
+    certification: [
+        {
+            title: {
+                type: String,
+                required: true
+            },
+            field: {
+                type: String,
+                required: true
+            },
+            from: {
+                type: Date,
+                required: true
+            },
+            to: {
+                type: Date
+            },
+            picture: {
+                type: String
+
+            },
+            code: {
+                type: String
+            }
+        }
+    ],
+
     social: {
         youtube: {
             type: String
