@@ -15,7 +15,7 @@ const { check, validationResult } = require('express-validator');
 // @Access Private 
 router.get('/', auth, async (req, res) => {
     try {
-        const user = await User.findById(req.user.id);
+        const user = await User.findById(req.user.id).select('-password');
         res.json(user);
     } catch (error) {
         console.error(error.message);
@@ -43,13 +43,13 @@ router.post('/', [
         let user = await User.findOne({ email });
 
         if (!user) {
-            res.status(400).json({ errors: [{ message: 'email does not match ' }] });
+            res.status(400).json({ errors: [{ message: 'Invalid paramaters , try again !' }] });
         }
 
         const isMatch = await bcrypt.compare(password.toString(), user.password);
 
         if (!isMatch) {
-            res.status(400).json({ errors: [{ message: 'password does not match ' }] });
+            res.status(400).json({ errors: [{ message: 'Invalid paramaters , try again !' }] });
         }
 
         // Return the JWT using jsonwebtoken
