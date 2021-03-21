@@ -505,6 +505,27 @@ router.put('/certification', [auth, [
 
 });
 
+//@route DELETE api/profile/certification/:cer_id
+//@desc Delete certification from profile
+//@access Private
+router.delete('/certification/:cer_id', auth, async (req, res) => {
+    try {
+        const profile = await Profile.findOne({ user: req.user.id });
+
+        //Get remove index 
+        const removeIndex = profile.certification.map(item => item.id).indexOf(req.params.cer_id);
+
+        profile.certification.splice(removeIndex, 1);
+
+        await profile.save();
+        res.json(profile);
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server error');
+    }
+});
+
 
 //@route POST api/profile/report/:id
 //@desc report a post
