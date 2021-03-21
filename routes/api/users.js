@@ -14,12 +14,14 @@ const User = require('../../models/User');
 
 const router = express.Router();
 
+//@author Firas Belhiba
 //@Route GET api/users
 // @Description  Test route 
 // @Access Public 
 //router.get('/', (req, res) => res.send('Users route '));
 
 
+//@author Firas Belhiba
 //@Route POST api/users
 // @Description  Register route 
 // @Access Public 

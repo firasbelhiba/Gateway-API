@@ -6,6 +6,7 @@ const Profile = require("../../models/Profile");
 const User = require("../../models/User");
 const { check, validationResult } = require("express-validator/check");
 
+//@author Ghada Khedri
 //@route POST api/posts/
 //@desc add post
 //@access Private
@@ -36,6 +37,7 @@ router.post(
   }
 );
 
+//@author Ghada Khedri
 //@route GET api/posts/
 //@desc Get all post
 //@access Public
@@ -50,6 +52,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+//@author Ghada Khedri
 //@route GET api/posts/:id
 //@desc Get by id post
 //@access Public
@@ -69,6 +72,8 @@ router.get("/:id", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+//@author Ghada Khedri
 //@route DELETE api/posts/:id
 //@desc DELETE by id post
 //@access Private
@@ -94,6 +99,7 @@ router.delete("/:id", auth, async (req, res) => {
   }
 });
 
+//@author Ghada Khedri
 //@route PUT api/posts/like/:id
 //@desc Like a post
 //@access Private
@@ -120,6 +126,7 @@ router.put("/like/:id", auth, async (req, res) => {
   }
 });
 
+//@author Ghada Khedri
 //@route PUT api/posts/unlike/:id
 //@desc Unlike a post
 //@access Private
@@ -153,6 +160,8 @@ router.put("/unlike/:id", auth, async (req, res) => {
   }
 });
 
+
+//@author Ghada Khedri
 //@route POST api/posts/comment/:id
 //@desc comment a post
 //@access Private
@@ -188,6 +197,7 @@ router.post(
   }
 );
 
+//@author Ghada Khedri
 //@route DELETE api/posts/comment/:id/:id_com
 //@desc delete a comment
 //@access Private
@@ -227,6 +237,7 @@ router.delete("/comment/:id/:id_com", auth, async (req, res) => {
   }
 });
 
+//@author Ghada Khedri
 //@route UPDATE api/posts/:id
 //@desc update a post
 //@access Private
@@ -273,6 +284,8 @@ router.put(
     }
   }
 );
+
+//@author Ghada Khedri
 //@route UPDATE api/posts/comment/:id/:id_com
 //@desc update a comment
 //@access Private
@@ -313,6 +326,7 @@ router.put(
   }
 );
 
+//@author Ghada Khedri
 //@route POST api/posts/report/:id
 //@desc report a post
 //@access Private

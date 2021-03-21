@@ -10,6 +10,7 @@ const Profile = require('../../models/Profile');
 const User = require('../../models/User');
 
 
+//@author Firas Belhiba
 //@route GET api/profile/me
 //@desc Get current users profile 
 //@access Private
@@ -33,6 +34,7 @@ router.get('/me', auth, async (req, res) => {
 
 });
 
+//@author Firas Belhiba
 //@route POST api/profile
 //@desc Create or upddate a user profile 
 //@access Private
@@ -99,6 +101,7 @@ router.post('/', [auth, [
 
 });
 
+//@author Firas Belhiba
 //@route GET api/profile
 //@desc Get all profiles
 //@access Public 
@@ -115,6 +118,7 @@ router.get('/', async (req, res) => {
 
 });
 
+//@author Firas Belhiba
 //@route GET api/profile/user/:user_id
 //@desc Get profile by user id 
 //@access Public
@@ -137,6 +141,7 @@ router.get('/user/:user_id', async (req, res) => {
 
 });
 
+//@author Firas Belhiba
 //@route DELETE api/profile
 //@desc Delete profile , user & posts 
 //@access Private
@@ -159,6 +164,7 @@ router.delete('/', auth, async (req, res) => {
 
 });
 
+//@author Firas Belhiba
 //@route PUT api/profile/experience
 //@desc Add profile experience 
 //@access Private
@@ -198,6 +204,7 @@ router.put('/experience', [auth, [
 
 });
 
+//@author Firas Belhiba
 //@route DELETE api/profile/experience/:exp_id
 //@desc Delete experience from profile
 //@access Private
@@ -219,7 +226,7 @@ router.delete('/experience/:exp_id', auth, async (req, res) => {
     }
 });
 
-
+//@author Firas Belhiba
 //@route Put api/profile/experience/:exp_id
 //@desc update experience from profile
 //@access Private
@@ -258,6 +265,7 @@ router.put('/experience/:exp_id', [auth, [
     }
 });
 
+//@author Firas Belhiba
 //@route PUT api/profile/education
 //@desc Add profile education  
 //@access Private 
@@ -298,6 +306,7 @@ router.put('/education', [auth, [
 
 });
 
+//@author Firas Belhiba
 //@route DELETE api/profile/education/:edu_id
 //@desc Delete an education from profile  
 //@access Private
@@ -320,7 +329,7 @@ router.delete('/education/:edu_id', auth, async (req, res) => {
 
 });
 
-
+//@author Firas Belhiba
 //@route Put api/profile/education/:edu_id
 //@desc update education from profile
 //@access Private
@@ -360,7 +369,7 @@ router.put('/education/:edu_id', [auth, [
     }
 });
 
-
+//@author Firas Belhiba
 //@route PUT api/profile/volunteer
 //@desc Add a volunteer experience  
 //@access Private 
@@ -401,7 +410,7 @@ router.put('/volunteer', [auth, [
 
 });
 
-
+//@author Firas Belhiba
 //@route DELETE api/profile/volunteer/:Vol_id
 //@desc Delete volunteer from profile
 //@access Private
@@ -424,7 +433,7 @@ router.delete('/volunteer/:Vol_id', auth, async (req, res) => {
     }
 });
 
-
+//@author Firas Belhiba
 //@route Put api/profile/volunteer/:vol_id
 //@desc update volunteer from profile
 //@access Private
@@ -463,7 +472,7 @@ router.put('/volunteer/:vol_id', [auth, [
     }
 });
 
-
+//@author Firas Belhiba
 //@route PUT api/profile/certification
 //@desc Add a certification   
 //@access Private 
@@ -506,7 +515,7 @@ router.put('/certification', [auth, [
     }
 
 });
-
+//@author Firas Belhiba
 //@route DELETE api/profile/certification/:cer_id
 //@desc Delete certification from profile
 //@access Private
@@ -527,7 +536,7 @@ router.delete('/certification/:cer_id', auth, async (req, res) => {
         res.status(500).send('Server error');
     }
 });
-
+//@author Firas Belhiba
 //@route PUT api/profile/certification/:cer_id
 //@desc update certification from profile
 //@access Private
@@ -567,7 +576,7 @@ router.put('/certification/:cer_id', [auth, [
 });
 
 
-
+//@author Firas Belhiba
 //@route POST api/profile/report/:id
 //@desc report a post
 //@access Private

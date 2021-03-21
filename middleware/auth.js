@@ -1,6 +1,9 @@
 const jwt = require('jsonwebtoken');
 const config = require('config');
 
+
+//@author Firas Belhiba
+//@desc middleware responsible for token verification ( Private methods ) (Authorization)
 module.exports = function (req, res, next) {
 
     // Get token from header ( when we send a request to a prootected route we need this middleware)

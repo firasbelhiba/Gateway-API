@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../../models/User');
 const { check, validationResult } = require('express-validator');
 
+//@author Firas Belhiba
 //@Route GET api/auth
 // @Description  Finduserbyid from token route 
 // @Access Private 
@@ -23,6 +24,7 @@ router.get('/', auth, async (req, res) => {
     }
 });
 
+//@author Firas Belhiba
 //@Route POST api/auth
 // @Description  Authenticate user route 
 // @Access Public  
