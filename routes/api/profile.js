@@ -462,6 +462,48 @@ router.put('/volunteer/:vol_id', [auth, [
 });
 
 
+//@route PUT api/profile/certification
+//@desc Add a certification   
+//@access Private 
+router.put('/certification', [auth, [
+    check('title', 'Title is required').not().isEmpty(),
+    check('field', 'Field is required').not().isEmpty(),
+    check('from', 'From date is required').not().isEmpty()
+]], async (req, res) => {
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+
+
+    const { title, field, from, to, picture, code } = req.body;
+
+    const newCertification = {
+        title, field, from, to, picture, code
+    }
+
+    try {
+
+        const profile = await Profile.findOne({ user: req.user.id });
+
+        console.log('this is the profile  : ', profile)
+
+
+        // unshift it push in the begging rather than the end 
+        profile.certification.unshift(newCertification);
+
+        await profile.save();
+
+        res.json(profile);
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server error');
+    }
+
+});
 
 
 //@route POST api/profile/report/:id
