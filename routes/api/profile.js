@@ -8,6 +8,7 @@ const { check, validationResult } = require('express-validator/check');
 const auth = require('../../middleware/auth');
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
+const { route } = require('./posts');
 
 
 //@author Firas Belhiba
@@ -109,6 +110,10 @@ router.get('/', async (req, res) => {
     try {
         const profiles = await Profile.find()
             .populate('user', ['name', 'avatar']);
+
+
+
+
         res.json(profiles);
     } catch (error) {
         console.error(error.message);
@@ -640,6 +645,84 @@ router.get('/github/:username', async (req, res) => {
         res.status(500).send("Server error");
     }
 });
+
+
+//@author Firas Belhiba
+//@route PUT api/profile/follow/:id
+//@desc follow a post
+//@access Private
+//Todo
+
+//@author Firas Belhiba
+//@route PUT api/profile/unfollow/:id
+//@desc Unfollow a post
+//@access Private
+
+//@author Firas Belhiba
+//@route GET api/profile
+//@desc Get all profiles
+//@access Private 
+router.get('/getmyall', auth, async (req, res) => {
+    try {
+        const profiles = await Profile.find(filter((block_list) => block_list.user.toString() === req.user.id))
+            .populate('user', ['name', 'avatar']);
+
+
+        res.json(profiles);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server error');
+    }
+
+
+});
+
+//@author Firas Belhiba
+//@route PUT api/profile/block/:id
+//@desc Block profile
+//@access Private
+router.put('/block/:id', auth, async (req, res) => {
+    try {
+
+        const profile = await Profile.findOne({ user: req.user.id });
+
+
+        const blockedProfile = await Profile.findOne({ user: req.params.id });
+
+
+        if (!blockedProfile) {
+            return res.status(404).json({ message: "Post not Found " });
+        }
+
+        //Check if the profile is already blocked by the user
+        if (
+            profile.block_list.filter((block) => block.user.toString() == blockedProfile.user).length >
+            0
+        ) {
+            return res.status(400).json({ message: "This user is already blocked !" });
+        }
+
+        profile.block_list.unshift({ user: blockedProfile.user });
+
+        await profile.save();
+
+        res.json(profile.block_list);
+
+    } catch (error) {
+
+        console.error(error.message);
+
+        if (error.kind === "ObjectId") {
+            return res.status(404).json({ message: "Post not Found " });
+        }
+
+        res.status(500).send("Server error");
+    }
+});
+
+
+
+
 
 
 

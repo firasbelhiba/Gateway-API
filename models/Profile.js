@@ -31,7 +31,31 @@ const ProfileSchema = new mongoose.Schema({
     githubusername: {
         type: String
     },
+    follwers: [
+        {
+            user: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "user",
+            },
+        },
+    ],
+    following: [
+        {
+            user: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "user",
+            },
+        },
+    ],
     reports: [
+        {
+            user: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "user",
+            },
+        },
+    ],
+    block_list: [
         {
             user: {
                 type: mongoose.Schema.Types.ObjectId,

@@ -4,6 +4,8 @@ const config = require('config');
 const auth = require('../../middleware/auth');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+const sendgridtransport = require('nodemailer-sendgrid-transport');
 
 
 
@@ -76,4 +78,6 @@ router.post('/', [
     }
 
 });
+
+
 module.exports = router;
