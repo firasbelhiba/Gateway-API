@@ -313,4 +313,27 @@ router.put(
   }
 );
 
+//@route POST api/posts/report/:id
+//@desc report a post
+//@access Private
+router.post("/report/:id", auth, async (req, res) => {
+  try {
+    const post = await Post.findOne({ _id: req.params.id });
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+
+    post.reports.unshift({ user: req.user.id });
+    await post.save();
+    res.json(post.reports);
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
+
 module.exports = router;

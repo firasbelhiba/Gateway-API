@@ -36,6 +36,14 @@ const PostSchema = new Schema({
       },
     },
   ],
+  reports: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+      },
+    },
+  ],
   comments: [
     {
       user: {
