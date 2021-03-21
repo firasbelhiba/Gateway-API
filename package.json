@@ -4,7 +4,8 @@
   "description": "Collaborative social network ",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server",
+    "ghada": "nodemon server"
   },
   "author": "Firas Belhiba",
   "license": "ISC",
@@ -13,9 +14,11 @@
     "config": "^3.3.4",
     "express": "^4.17.1",
     "express-validator": "^6.10.0",
+    "fs": "0.0.1-security",
     "gravatar": "^1.8.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.11.18",
+    "nodemon": "^2.0.7",
     "request": "^2.88.2"
   }
 }
