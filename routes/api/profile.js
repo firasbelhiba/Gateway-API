@@ -721,8 +721,55 @@ router.put('/block/:id', auth, async (req, res) => {
 });
 
 
+//@author Firas Belhiba
+//@route DELETE api/profile/block/:id
+//@desc Unblock profile
+//@access Private
+router.delete('/unblock/:id', auth, async (req, res) => {
+    try {
+
+        const profile = await Profile.findOne({ user: req.user.id });
 
 
+        const blockedProfile = await Profile.findOne({ user: req.params.id });
+
+
+        if (!blockedProfile) {
+            return res.status(404).json({ message: "Post not Found " });
+        }
+
+
+        //Check if the profile is already unblocked by the user
+        if (
+            profile.block_list.filter((block) => block.user.toString() == blockedProfile.user).length ==
+            0
+        ) {
+            return res.status(400).json({ message: "This user is not blocked !" });
+        }
+
+
+        //Remove Index
+        const removeIndex = profile.block_list
+            .map((block) => block.user.toString())
+            .indexOf(blockedProfile.user);
+
+        profile.block_list.splice(removeIndex, 1);
+
+        await profile.save();
+
+        res.json(profile.block_list);
+
+    } catch (error) {
+
+        console.error(error.message);
+
+        if (error.kind === "ObjectId") {
+            return res.status(404).json({ message: "Post not Found " });
+        }
+
+        res.status(500).send("Server error");
+    }
+});
 
 
 
