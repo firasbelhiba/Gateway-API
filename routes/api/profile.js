@@ -240,12 +240,12 @@ router.put('/experience/:exp_id', [auth, [
     try {
         const profile = await Profile.findOne({ user: req.user.id });
 
-        //Get remove index 
-        const removeIndex = profile.experience.map(item => item.id).indexOf(req.params.exp_id);
+        //Get index 
+        const updateIndex = profile.experience.map(item => item.id).indexOf(req.params.exp_id);
 
 
 
-        profile.experience[removeIndex] = newExperience;
+        profile.experience[updateIndex] = newExperience;
 
         await profile.save();
         res.json(profile);
@@ -342,12 +342,12 @@ router.put('/education/:edu_id', [auth, [
     try {
         const profile = await Profile.findOne({ user: req.user.id });
 
-        //Get remove index 
-        const removeIndex = profile.education.map(item => item.id).indexOf(req.params.edu_id);
+        //Get index 
+        const updateIndex = profile.education.map(item => item.id).indexOf(req.params.edu_id);
 
 
 
-        profile.education[removeIndex] = newEducation;
+        profile.education[updateIndex] = newEducation;
 
         await profile.save();
         res.json(profile);
@@ -445,12 +445,12 @@ router.put('/volunteer/:vol_id', [auth, [
     try {
         const profile = await Profile.findOne({ user: req.user.id });
 
-        //Get remove index 
-        const removeIndex = profile.Volunteer.map(item => item.id).indexOf(req.params.vol_id);
+        //Get index 
+        const updateIndex = profile.Volunteer.map(item => item.id).indexOf(req.params.vol_id);
 
 
 
-        profile.Volunteer[removeIndex] = newVolunteer;
+        profile.Volunteer[updateIndex] = newVolunteer;
 
         await profile.save();
         res.json(profile);

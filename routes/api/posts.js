@@ -295,12 +295,12 @@ router.put(
         avatar: user.avatar,
       };
 
-      //Get remove index
-      const removeIndex = post.comments
+      //Get index
+      const updateIndex = post.comments
         .map((item) => item.id)
         .indexOf(req.params.id_com);
 
-      post.comments[removeIndex] = newComment;
+      post.comments[updateIndex] = newComment;
       await post.save();
       res.json(post);
     } catch (error) {
