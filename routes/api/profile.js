@@ -462,45 +462,40 @@ router.put('/volunteer/:vol_id', [auth, [
 });
 
 
-//@route PUT api/profile/certifcation
-//@desc Add a certifcation   
-//@access Private 
-router.put('/certifcation', [auth, [
-    check('title', 'Title is required').not().isEmpty(),
-    check('company', 'Company is required').not().isEmpty(),
-    check('from', 'From date is required').not().isEmpty()
-]], async (req, res) => {
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { title, company, location, from, to, current, description } = req.body;
 
 
-    const newCertifcation = {
-        title, company, location, from, to, current, description
-    }
-
+//@route POST api/profile/report/:id
+//@desc report a post
+//@access Private
+router.post("/report/:id", auth, async (req, res) => {
     try {
 
-        const profile = await Profile.findOne({ user: req.user.id });
+        const profile = await Profile.findOne({ _id: req.params.id });
 
-        // unshift it push in the begging rather than the end 
-        // Missclick the certifcation on the model is capital casess
-        profile.certifcation.unshift(newCertifcation);
+
+        if (!profile) {
+            return res.status(404).json({ message: "Post not Found " });
+        }
+
+        profile.reports.unshift({ user: req.user.id });
 
         await profile.save();
 
-        res.json(profile);
+        res.json(profile.reports);
 
     } catch (error) {
-        console.error(error.message);
-        res.status(500).send('Server error');
-    }
 
+        console.error(error.message);
+
+        if (error.kind === "ObjectId") {
+            return res.status(404).json({ message: "Post not Found " });
+        }
+
+        res.status(500).send("Server error");
+    }
 });
+
+
 
 
 

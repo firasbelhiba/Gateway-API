@@ -31,6 +31,14 @@ const ProfileSchema = new mongoose.Schema({
     githubusername: {
         type: String
     },
+    reports: [
+        {
+            user: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "user",
+            },
+        },
+    ],
     experience: [
         {
             title: {
