@@ -49,4 +49,25 @@ router.get("/", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+//@route GET api/posts/:id
+//@desc Get by id post
+//@access Public
+
+router.get("/:id", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    res.json(post);
+    if (!post) {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
+
 module.exports = router;
