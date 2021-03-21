@@ -526,6 +526,45 @@ router.delete('/certification/:cer_id', auth, async (req, res) => {
     }
 });
 
+//@route PUT api/profile/certification/:cer_id
+//@desc update certification from profile
+//@access Private
+router.put('/certification/:cer_id', [auth, [
+    check('title', 'Title is required').not().isEmpty(),
+    check('field', 'Field is required').not().isEmpty(),
+    check('from', 'From date is required').not().isEmpty()
+]], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { title, field, from, to, picture, code } = req.body;
+
+    const newCertification = {
+        title, field, from, to, picture, code
+    }
+
+    try {
+        const profile = await Profile.findOne({ user: req.user.id });
+
+        //Get index 
+        const updateIndex = profile.certification.map(item => item.id).indexOf(req.params.cer_id);
+
+
+
+        profile.certification[updateIndex] = newCertification;
+
+        await profile.save();
+        res.json(profile);
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server error');
+    }
+});
+
+
 
 //@route POST api/profile/report/:id
 //@desc report a post
