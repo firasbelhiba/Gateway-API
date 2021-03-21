@@ -227,4 +227,51 @@ router.delete("/comment/:id/:id_com", auth, async (req, res) => {
   }
 });
 
+//@route UPDATE api/posts/:id
+//@desc update a post
+//@access Private
+router.put(
+  "/:id",
+  [auth, [check("text", "Text is required").not().isEmpty()]],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+      const user = await User.findById(req.user.id).select("-password");
+      const newPost = {
+        user: req.user.id,
+        text: req.body.text,
+        name: user.name,
+        avatar: user.avatar,
+        category: req.body.category,
+      };
+
+      let post = await Post.findOne({ _id: req.params.id });
+
+      if (!post) {
+        return res.status(404).json({ message: "Post not Found " });
+      }
+
+      if (post) {
+        post = await Post.findOneAndUpdate(
+          { _id: req.params.id },
+          { $set: newPost },
+          { new: true }
+        );
+        return res.json(post);
+      }
+      await post.save();
+      res.json(post);
+    } catch (error) {
+      console.error(error.message);
+      if (error.kind === "ObjectId") {
+        return res.status(404).json({ message: "Post not Found " });
+      }
+      res.status(500).send("Server error");
+    }
+  }
+);
+
 module.exports = router;
