@@ -160,7 +160,6 @@ router.put("/unlike/:id", auth, async (req, res) => {
   }
 });
 
-
 //@author Ghada Khedri
 //@route POST api/posts/comment/:id
 //@desc comment a post
@@ -341,6 +340,34 @@ router.post("/report/:id", auth, async (req, res) => {
     post.reports.unshift({ user: req.user.id });
     await post.save();
     res.json(post.reports);
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
+
+//@author Ghada Khedri
+//@route PUT api/posts/shared/:id
+//@desc share a post
+//@access Private
+router.put("/shared/:id", auth, async (req, res) => {
+  try {
+    const post = await Post.findOne({ _id: req.params.id });
+    const user = await User.findById(req.user.id).select("-password");
+    const profile = await Profile.findOne({ user: user._id });
+    if (!post) {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+    //
+
+    console.log(profile);
+
+    profile.shared.unshift({ post: req.params.id });
+    await profile.save();
+    res.json(profile.shared);
   } catch (error) {
     console.error(error.message);
     if (error.kind === "ObjectId") {
