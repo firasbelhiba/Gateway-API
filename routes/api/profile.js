@@ -69,11 +69,11 @@ router.post('/', [auth, [
 
     // Build social network object 
     profileFields.social = {};
-    if (youtube) profileFields.youtube = youtube;
-    if (facebook) profileFields.facebook = facebook;
-    if (twitter) profileFields.twitter = twitter;
-    if (linkedin) profileFields.linkedin = linkedin;
-    if (instagram) profileFields.instagram = instagram;
+    if (youtube) profileFields.social.youtube = youtube;
+    if (facebook) profileFields.social.facebook = facebook;
+    if (twitter) profileFields.social.twitter = twitter;
+    if (linkedin) profileFields.social.linkedin = linkedin;
+    if (instagram) profileFields.social.instagram = instagram;
 
     try {
 
@@ -583,7 +583,7 @@ router.put('/certification/:cer_id', [auth, [
 
 //@author Firas Belhiba
 //@route POST api/profile/report/:id
-//@desc report a post
+//@desc report a profile
 //@access Private
 router.post("/report/:id", auth, async (req, res) => {
     try {
@@ -664,11 +664,29 @@ router.get('/github/:username', async (req, res) => {
 //@access Private 
 router.get('/getmyall', auth, async (req, res) => {
     try {
-        const profiles = await Profile.find(filter((block_list) => block_list.user.toString() === req.user.id))
+        const profiles = await Profile.find()
             .populate('user', ['name', 'avatar']);
 
+        const profile = await Profile.findOne({ user: req.user.id });
 
-        res.json(profiles);
+
+        const block_list = profile.block_list.filter((block) => block.user.toString());
+
+        console.log('voici la liste', block_list.filter((block) => block.user.toString() === profiles[0].user.toString()).length);
+
+
+
+
+
+        for (var i = 0; i < profiles.length; i++) {
+            if (profile.block_list.filter((block) => block.user.toString() == profiles[i].user)) {
+                profiles.splice(i, 1);
+            }
+
+        }
+
+
+        res.json(profiles.length);
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Server error');
