@@ -832,7 +832,48 @@ router.post('/upload', [upload.array('image'), auth], async (req, res) => {
             err: "Images not uploaded succefully"
         })
     }
-})
+});
+
+
+//@author Firas Belhiba
+//@route POST api/profile/cover
+//@desc update cover picture 
+//@access private
+router.post('/cover', [upload.array('image'), auth], async (req, res) => {
+    try {
+
+        const uploader = async (path) => await cloudinary.uploads(path, 'Images')
+
+        const urls = []
+
+        const files = req.files
+
+        for (const file of files) {
+            const { path } = file
+            const newPath = await uploader(path)
+            urls.push(newPath)
+            fs.unlinkSync(path)
+        }
+
+        profileField = {};
+        profileField.cover_image = urls[0].url;
+
+        profile = await Profile.findOneAndUpdate({ user: req.user.id },
+            { $set: profileField },
+            { new: true }
+        );
+
+        res.status(200).json({
+            message: 'Images Uploaded Succefully',
+            data: urls,
+            updatedProfile: profile
+        })
+    } catch (error) {
+        res.status(405).json({
+            err: "Images not uploaded succefully"
+        })
+    }
+});
 
 
 
