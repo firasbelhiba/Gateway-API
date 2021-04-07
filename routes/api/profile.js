@@ -9,6 +9,11 @@ const auth = require('../../middleware/auth');
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
 const { route } = require('./posts');
+const cloudinary = require('../../utils/cloudinary');
+const upload = require('../../middleware/multer');
+const fs = require('fs');
+
+
 
 
 //@author Firas Belhiba
@@ -788,6 +793,47 @@ router.delete('/unblock/:id', auth, async (req, res) => {
         res.status(500).send("Server error");
     }
 });
+
+
+//@author Firas Belhiba
+//@route POST api/profile/upload
+//@desc update profile picture 
+//@access private
+router.post('/upload', [upload.array('image'), auth], async (req, res) => {
+    try {
+
+        const uploader = async (path) => await cloudinary.uploads(path, 'Images')
+
+        const urls = []
+
+        const files = req.files
+
+        for (const file of files) {
+            const { path } = file
+            const newPath = await uploader(path)
+            urls.push(newPath)
+            fs.unlinkSync(path)
+        }
+
+        userField = {};
+        userField.avatar = urls[0].url;
+        user = await User.findOneAndUpdate({ _id: req.user.id },
+            { $set: userField },
+            { new: true }
+        ).select("-password");
+
+        res.status(200).json({
+            message: 'Images Uploaded Succefully',
+            data: urls,
+            updatedUser: user
+        })
+    } catch (error) {
+        res.status(405).json({
+            err: "Images not uploaded succefully"
+        })
+    }
+})
+
 
 
 
