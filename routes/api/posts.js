@@ -12,7 +12,13 @@ const { check, validationResult } = require("express-validator/check");
 //@access Private
 router.post(
   "/",
-  [auth, [check("text", "Text is required ").not().isEmpty()]],
+  [
+    auth,
+    [
+      check("text", "Text is required ").not().isEmpty(),
+      check("title", "title is required ").not().isEmpty(),
+    ],
+  ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty) {
@@ -23,6 +29,7 @@ router.post(
 
       const newPost = new Post({
         user: req.user.id,
+        title: req.body.title,
         text: req.body.text,
         avatar: user.avatar,
         name: user.name,
@@ -242,7 +249,13 @@ router.delete("/comment/:id/:id_com", auth, async (req, res) => {
 //@access Private
 router.put(
   "/:id",
-  [auth, [check("text", "Text is required").not().isEmpty()]],
+  [
+    auth,
+    [
+      check("text", "Text is required").not().isEmpty(),
+      check("title", "Title is required").not().isEmpty(),
+    ],
+  ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors) {
@@ -252,6 +265,7 @@ router.put(
       const user = await User.findById(req.user.id).select("-password");
       const newPost = {
         user: req.user.id,
+        title: req.body.title,
         text: req.body.text,
         name: user.name,
         avatar: user.avatar,

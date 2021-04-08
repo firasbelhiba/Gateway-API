@@ -25,10 +25,7 @@ app.use(function (req, res, next) {
   );
 
   // Request headers you wish to allow
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-Requested-With,content-type"
-  );
+  res.setHeader("Access-Control-Allow-Headers", "*");
 
   // Set to true if you need the website to include cookies in the requests sent
   // to the API (e.g. in case you use sessions)
@@ -45,7 +42,6 @@ app.use("/api/profile", require("./routes/api/profile"));
 app.use("/api/posts", require("./routes/api/posts"));
 app.use("/api/q_and_a", require("./routes/api/q_and_a"));
 app.use("/api/jobs", require("./routes/api/jobs"));
-
 
 const PORT = process.env.PORT || 5000;
 
