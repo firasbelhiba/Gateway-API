@@ -5,6 +5,9 @@ const Post = require("../../models/Post");
 const Profile = require("../../models/Profile");
 const User = require("../../models/User");
 const { check, validationResult } = require("express-validator/check");
+const upload = require("../../middleware/multer");
+const fs = require("fs");
+const cloudinary = require("../../utils/cloudinary");
 
 //@author Ghada Khedri
 //@route POST api/posts/
@@ -18,6 +21,7 @@ router.post(
       check("text", "Text is required ").not().isEmpty(),
       check("title", "title is required ").not().isEmpty(),
     ],
+    upload.array("image"),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -27,10 +31,21 @@ router.post(
     try {
       const user = await User.findById(req.user.id).select("-password");
 
+      const uploader = async (path) => await cloudinary.uploads(path, "Images");
+      const urls = [];
+      const files = req.files;
+      for (const file of files) {
+        const { path } = file;
+        const newPath = await uploader(path);
+        urls.push(newPath);
+        fs.unlinkSync(path);
+      }
+
       const newPost = new Post({
         user: req.user.id,
         title: req.body.title,
         text: req.body.text,
+        image: urls[0].url,
         avatar: user.avatar,
         name: user.name,
         category: req.body.category,

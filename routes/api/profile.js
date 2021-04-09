@@ -8,6 +8,9 @@ const auth = require("../../middleware/auth");
 const Profile = require("../../models/Profile");
 const User = require("../../models/User");
 const { route } = require("./posts");
+const cloudinary = require("../../utils/cloudinary");
+const upload = require("../../middleware/multer");
+const fs = require("fs");
 
 //@author Firas Belhiba
 //@route GET api/profile/me
@@ -716,7 +719,7 @@ router.put(
 
 //@author Firas Belhiba
 //@route POST api/profile/report/:id
-//@desc report a post
+//@desc report a profile
 //@access Private
 router.post("/report/:id", auth, async (req, res) => {
   try {
@@ -791,11 +794,32 @@ router.get("/github/:username", async (req, res) => {
 //@access Private
 router.get("/getmyall", auth, async (req, res) => {
   try {
-    const profiles = await Profile.find(
-      filter((block_list) => block_list.user.toString() === req.user.id)
-    ).populate("user", ["name", "avatar"]);
+    const profiles = await Profile.find().populate("user", ["name", "avatar"]);
 
-    res.json(profiles);
+    const profile = await Profile.findOne({ user: req.user.id });
+
+    const block_list = profile.block_list.filter((block) =>
+      block.user.toString()
+    );
+
+    console.log(
+      "voici la liste",
+      block_list.filter(
+        (block) => block.user.toString() === profiles[0].user.toString()
+      ).length
+    );
+
+    for (var i = 0; i < profiles.length; i++) {
+      if (
+        profile.block_list.filter(
+          (block) => block.user.toString() == profiles[i].user
+        )
+      ) {
+        profiles.splice(i, 1);
+      }
+    }
+
+    res.json(profiles.length);
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server error");
@@ -884,6 +908,85 @@ router.delete("/unblock/:id", auth, async (req, res) => {
     }
 
     res.status(500).send("Server error");
+  }
+});
+
+//@author Firas Belhiba
+//@route POST api/profile/upload
+//@desc update profile picture
+//@access private
+router.post("/upload", [upload.array("image"), auth], async (req, res) => {
+  try {
+    const uploader = async (path) => await cloudinary.uploads(path, "Images");
+
+    const urls = [];
+
+    const files = req.files;
+
+    for (const file of files) {
+      const { path } = file;
+      const newPath = await uploader(path);
+      urls.push(newPath);
+      fs.unlinkSync(path);
+    }
+
+    userField = {};
+    userField.avatar = urls[0].url;
+    user = await User.findOneAndUpdate(
+      { _id: req.user.id },
+      { $set: userField },
+      { new: true }
+    ).select("-password");
+
+    res.status(200).json({
+      message: "Images Uploaded Succefully",
+      data: urls,
+      updatedUser: user,
+    });
+  } catch (error) {
+    res.status(405).json({
+      err: "Images not uploaded succefully",
+    });
+  }
+});
+
+//@author Firas Belhiba
+//@route POST api/profile/cover
+//@desc update cover picture
+//@access private
+router.post("/cover", [upload.array("image"), auth], async (req, res) => {
+  try {
+    const uploader = async (path) => await cloudinary.uploads(path, "Images");
+
+    const urls = [];
+
+    const files = req.files;
+
+    for (const file of files) {
+      const { path } = file;
+      const newPath = await uploader(path);
+      urls.push(newPath);
+      fs.unlinkSync(path);
+    }
+
+    profileField = {};
+    profileField.cover_image = urls[0].url;
+
+    profile = await Profile.findOneAndUpdate(
+      { user: req.user.id },
+      { $set: profileField },
+      { new: true }
+    );
+
+    res.status(200).json({
+      message: "Images Uploaded Succefully",
+      data: urls,
+      updatedProfile: profile,
+    });
+  } catch (error) {
+    res.status(405).json({
+      err: "Images not uploaded succefully",
+    });
   }
 });
 

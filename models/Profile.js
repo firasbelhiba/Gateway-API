@@ -31,6 +31,10 @@ const ProfileSchema = new mongoose.Schema({
   githubusername: {
     type: String,
   },
+  cover_image: {
+    type: String,
+    default: null,
+  },
   follwers: [
     {
       user: {

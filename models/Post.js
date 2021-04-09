@@ -32,6 +32,9 @@ const PostSchema = new Schema({
     type: String,
     enum: Object.values(category),
   },
+  image: {
+    type: String,
+  },
   likes: [
     {
       user: {
