@@ -391,13 +391,38 @@ router.put("/shared/:id", auth, async (req, res) => {
     if (!post) {
       return res.status(404).json({ message: "Post not Found " });
     }
-    //
-
-    console.log(profile);
 
     profile.shared.unshift({ post: req.params.id });
     await profile.save();
     res.json(profile.shared);
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
+
+//@author Ghada Khedri
+//@route PUT api/posts/view/:id
+//@desc view a post
+//@access Private
+router.put("/view/:id", auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    //Check if the view is already there
+    if (
+      post.views.filter((view) => view.user.toString() === req.user.id).length >
+      0
+    ) {
+      return res.status(400).json({ message: "Post already viewed !" });
+    }
+
+    post.views.unshift({ user: req.user.id });
+    await post.save();
+    res.json(post.views);
   } catch (error) {
     console.error(error.message);
     if (error.kind === "ObjectId") {
