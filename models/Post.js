@@ -31,9 +31,11 @@ const PostSchema = new Schema({
   category: {
     type: String,
     enum: Object.values(category),
+    require: true,
   },
   image: {
     type: String,
+    default: null,
   },
   likes: [
     {
@@ -56,6 +58,9 @@ const PostSchema = new Schema({
       user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",
+      },
+      reason: {
+        type: String,
       },
     },
   ],

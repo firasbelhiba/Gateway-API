@@ -20,6 +20,7 @@ router.post(
     [
       check("text", "Text is required ").not().isEmpty(),
       check("title", "title is required ").not().isEmpty(),
+      check("category", "category is required ").not().isEmpty(),
     ],
     upload.array("image"),
   ],
@@ -366,7 +367,7 @@ router.post("/report/:id", auth, async (req, res) => {
       return res.status(404).json({ message: "Post not Found " });
     }
 
-    post.reports.unshift({ user: req.user.id });
+    post.reports.unshift({ user: req.user.id, reason: req.body.reason });
     await post.save();
     res.json(post.reports);
   } catch (error) {
