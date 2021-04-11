@@ -14,12 +14,16 @@ const PostSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",
   },
+  title: {
+    type: String,
+    require: true,
+  },
   text: {
     type: String,
     require: true,
   },
   name: {
-    type: String, 
+    type: String,
   },
   avatar: {
     type: String,
@@ -27,8 +31,21 @@ const PostSchema = new Schema({
   category: {
     type: String,
     enum: Object.values(category),
+    require: true,
+  },
+  image: {
+    type: String,
+    default: null,
   },
   likes: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+      },
+    },
+  ],
+  views: [
     {
       user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -41,6 +58,9 @@ const PostSchema = new Schema({
       user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",
+      },
+      reason: {
+        type: String,
       },
     },
   ],

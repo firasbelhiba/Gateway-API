@@ -5,6 +5,9 @@ const Post = require("../../models/Post");
 const Profile = require("../../models/Profile");
 const User = require("../../models/User");
 const { check, validationResult } = require("express-validator/check");
+const upload = require("../../middleware/multer");
+const fs = require("fs");
+const cloudinary = require("../../utils/cloudinary");
 
 //@author Ghada Khedri
 //@route POST api/posts/
@@ -12,7 +15,15 @@ const { check, validationResult } = require("express-validator/check");
 //@access Private
 router.post(
   "/",
-  [auth, [check("text", "Text is required ").not().isEmpty()]],
+  [
+    auth,
+    [
+      check("text", "Text is required ").not().isEmpty(),
+      check("title", "title is required ").not().isEmpty(),
+      check("category", "category is required ").not().isEmpty(),
+    ],
+    upload.array("image"),
+  ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty) {
@@ -21,9 +32,21 @@ router.post(
     try {
       const user = await User.findById(req.user.id).select("-password");
 
+      const uploader = async (path) => await cloudinary.uploads(path, "Images");
+      const urls = [];
+      const files = req.files;
+      for (const file of files) {
+        const { path } = file;
+        const newPath = await uploader(path);
+        urls.push(newPath);
+        fs.unlinkSync(path);
+      }
+
       const newPost = new Post({
         user: req.user.id,
+        title: req.body.title,
         text: req.body.text,
+        image: urls[0].url,
         avatar: user.avatar,
         name: user.name,
         category: req.body.category,
@@ -242,7 +265,13 @@ router.delete("/comment/:id/:id_com", auth, async (req, res) => {
 //@access Private
 router.put(
   "/:id",
-  [auth, [check("text", "Text is required").not().isEmpty()]],
+  [
+    auth,
+    [
+      check("text", "Text is required").not().isEmpty(),
+      check("title", "Title is required").not().isEmpty(),
+    ],
+  ],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors) {
@@ -252,6 +281,7 @@ router.put(
       const user = await User.findById(req.user.id).select("-password");
       const newPost = {
         user: req.user.id,
+        title: req.body.title,
         text: req.body.text,
         name: user.name,
         avatar: user.avatar,
@@ -337,7 +367,7 @@ router.post("/report/:id", auth, async (req, res) => {
       return res.status(404).json({ message: "Post not Found " });
     }
 
-    post.reports.unshift({ user: req.user.id });
+    post.reports.unshift({ user: req.user.id, reason: req.body.reason });
     await post.save();
     res.json(post.reports);
   } catch (error) {
