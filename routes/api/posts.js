@@ -393,6 +393,7 @@ router.put("/shared/:id", auth, async (req, res) => {
     }
     const newShare = {
       post: req.params.id,
+      user: req.user.id,
       title: post.title,
       text: post.text,
       avatar: post.avatar,
@@ -404,6 +405,48 @@ router.put("/shared/:id", auth, async (req, res) => {
       comments: post.comments,
     };
     profile.shared.unshift(newShare);
+    await profile.save();
+    res.json(profile.shared);
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
+
+//@author Ghada Khedri
+//@route DELETE api/posts/shared/:id/:id_share
+//@desc delete a share for a specific post
+//@access Private
+router.delete("/shared/:id/:id_share", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    const profile = await Profile.findOne({ user: user._id });
+    const post = await Post.findById(req.params.id);
+    const share = await profile.shared.find(
+      (share) => share.id === req.params.id_share
+    );
+
+    //Check if the share exists
+    if (!share) {
+      return res.status(400).json({ message: "Share does not exists " });
+    }
+
+    //Check if user the owner of the share
+    if (share.user.toString() !== req.user.id) {
+      return res
+        .status(401)
+        .json({ message: "You are not authorized to delete this post " });
+    }
+
+    //Get index
+    const removeIndex = profile.shared
+      .map((share) => share.user.toString())
+      .indexOf(req.user.id);
+
+    profile.shared.splice(removeIndex, 1);
     await profile.save();
     res.json(profile.shared);
   } catch (error) {
