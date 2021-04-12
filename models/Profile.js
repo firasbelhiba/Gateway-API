@@ -1,4 +1,11 @@
 const mongoose = require("mongoose");
+const fs = require("fs");
+
+const contents = fs.readFileSync("./data/categories.json");
+
+let categories = JSON.parse(contents);
+
+const category = Object.freeze(categories);
 
 const ProfileSchema = new mongoose.Schema({
   user: {
@@ -72,6 +79,78 @@ const ProfileSchema = new mongoose.Schema({
       post: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "post",
+      },
+      title: {
+        type: String,
+        require: true,
+      },
+      text: {
+        type: String,
+        require: true,
+      },
+      name: {
+        type: String,
+      },
+      avatar: {
+        type: String,
+      },
+      category: {
+        type: String,
+        enum: Object.values(category),
+        require: true,
+      },
+      image: {
+        type: String,
+        default: null,
+      },
+      likes: [
+        {
+          user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "user",
+          },
+        },
+      ],
+      views: [
+        {
+          user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "user",
+          },
+        },
+      ],
+      comments: [
+        {
+          user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "user",
+          },
+          text: {
+            type: String,
+          },
+          name: {
+            type: String,
+          },
+          avatar: {
+            type: String,
+          },
+          date: {
+            type: Date,
+            default: Date.now,
+          },
+        },
+      ],
+      views: [
+        {
+          user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "user",
+          },
+        },
+      ],
+      date: {
+        type: Date,
+        default: Date.now,
       },
     },
   ],
@@ -210,6 +289,10 @@ const ProfileSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+});
+
+Object.assign(ProfileSchema.statics, {
+  category,
 });
 
 module.exports = Profile = mongoose.model("profile", ProfileSchema);

@@ -391,8 +391,19 @@ router.put("/shared/:id", auth, async (req, res) => {
     if (!post) {
       return res.status(404).json({ message: "Post not Found " });
     }
-
-    profile.shared.unshift({ post: req.params.id });
+    const newShare = {
+      post: req.params.id,
+      title: post.title,
+      text: post.text,
+      avatar: post.avatar,
+      name: post.name,
+      category: post.category,
+      image: post.image,
+      likes: post.likes,
+      views: post.views,
+      comments: post.comments,
+    };
+    profile.shared.unshift(newShare);
     await profile.save();
     res.json(profile.shared);
   } catch (error) {
