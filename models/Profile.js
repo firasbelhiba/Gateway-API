@@ -49,18 +49,30 @@ const ProfileSchema = new mongoose.Schema({
   },
   follwers: [
     {
-      user: {
+      profile: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "user",
+        ref: "profile",
       },
+      name: {
+        type: String
+      },
+      avatar: {
+        type: String
+      }
     },
   ],
   following: [
     {
-      user: {
+      profile: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "user",
+        ref: "profile",
       },
+      name: {
+        type: String
+      },
+      avatar: {
+        type: String
+      }
     },
   ],
   reports: [

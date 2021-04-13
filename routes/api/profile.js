@@ -784,12 +784,119 @@ router.get("/github/:username", async (req, res) => {
 //@route PUT api/profile/follow/:id
 //@desc follow a post
 //@access Private
-//Todo
+router.put("/follow/:id", auth, async (req, res) => {
+  try {
+    const profile = await Profile.findOne({ user: req.user.id });
+
+    const followedProfile = await Profile.findById(req.params.id);
+
+    if (!profile) {
+      return res.status(400).json({ message: "Profile not found" });
+    }
+
+    if (req.params.id === profile.id) {
+      return res.status(400).json({ message: "You can't follow yourself !! " });
+    }
+
+    //Check if the profile is already followed
+    if (
+      profile.following.filter((follow) => follow.profile.toString() === req.params.id).length >
+      0
+    ) {
+      return res.status(400).json({ message: "You already followed this profile!" });
+    }
+
+    newFollowing = {};
+
+    newFollowing.profile = req.params.id;
+    newFollowing.name = followedProfile.name;
+    newFollowing.avatar = followedProfile.avatar;
+
+    newFollower = {};
+
+    newFollower.profile = profile.id
+    newFollower.name = profile.name
+    newFollower.avatar = profile.avatar
+
+
+    profile.following.unshift(newFollowing);
+
+    followedProfile.follwers.unshift(newFollower);
+
+    await profile.save();
+    await followedProfile.save();
+
+
+    res.json(profile.following);
+
+  } catch (error) {
+
+    console.error(error.message);
+
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Profile not Found " });
+    }
+
+    res.status(500).send("Server error");
+  }
+});
+
 
 //@author Firas Belhiba
 //@route PUT api/profile/unfollow/:id
 //@desc Unfollow a post
 //@access Private
+router.put("/unfollow/:id", auth, async (req, res) => {
+  try {
+    const profile = await Profile.findOne({ user: req.user.id });
+
+    const unfollowedProfile = await Profile.findById(req.params.id);
+
+
+    if (!profile) {
+      return res.status(400).json({ message: "Profile not found" });
+    }
+
+    if (req.params.id === profile.id) {
+      return res.status(400).json({ message: "You can't unfollow yourself !! " });
+    }
+
+    //Check if the profile is already followed
+    if (
+      profile.following.filter((follow) => follow.profile.toString() === req.params.id).length
+      === 0
+    ) {
+      return res.status(400).json({ message: "You already unfollowed this profile!" });
+    }
+
+
+    //Remove Index
+    const removeIndexFollowing = profile.following
+      .map((follow) => follow.profile.toString())
+      .indexOf(req.param.id);
+
+    const removeIndexFollowers = unfollowedProfile.follwers
+      .map((follow) => follow.profile.toString())
+      .indexOf(profile.id);
+
+
+    profile.following.splice(removeIndexFollowing, 1);
+
+    unfollowedProfile.follwers.splice(removeIndexFollowers, 1);
+
+
+    await profile.save();
+    await unfollowedProfile.save();
+
+    res.json(profile.following);
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
 
 //@author Firas Belhiba
 //@route GET api/profile
