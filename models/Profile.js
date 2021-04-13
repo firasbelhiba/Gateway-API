@@ -12,6 +12,12 @@ const ProfileSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",
   },
+  name: {
+    type: String,
+  },
+  avatar: {
+    type: String,
+  },
   company: {
     type: String,
   },
@@ -40,7 +46,6 @@ const ProfileSchema = new mongoose.Schema({
   },
   cover_image: {
     type: String,
-    default: null,
   },
   follwers: [
     {

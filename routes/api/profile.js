@@ -56,6 +56,8 @@ router.post(
       return res.status(400).json({ errors: errors.array() });
     }
 
+    const user = await User.findById(req.user.id).select("-password");
+
     const {
       company,
       website,
@@ -75,6 +77,8 @@ router.post(
     // Build profile object
     const profileFields = {};
     profileFields.user = req.user.id;
+    profileFields.name = user.name;
+    profileFields.avatar = user.avatar;
     if (company) profileFields.company = company;
     if (website) profileFields.website = website;
     if (location) profileFields.location = location;
@@ -128,7 +132,7 @@ router.post(
 //@access Public
 router.get("/", async (req, res) => {
   try {
-    const profiles = await Profile.find().populate("user", ["name", "avatar"]);
+    const profiles = await Profile.find();
 
     res.json(profiles);
   } catch (error) {
@@ -753,11 +757,10 @@ router.get("/github/:username", async (req, res) => {
   try {
     // This is only to show  repositories , if you want to show more or less just change the per_page parameters in the uri
     const options = {
-      uri: `https://api.github.com/users/${
-        req.params.username
-      }/repos?per_page=5&sort=created:asc&client_id=${config.get(
-        "githubClientId"
-      )}&client_secret=${config.get("githubSecret")}`,
+      uri: `https://api.github.com/users/${req.params.username
+        }/repos?per_page=5&sort=created:asc&client_id=${config.get(
+          "githubClientId"
+        )}&client_secret=${config.get("githubSecret")}`,
       method: "GET",
       headers: { "user-agent": "node.js" },
     };
@@ -937,11 +940,18 @@ router.post("/upload", [upload.array("image"), auth], async (req, res) => {
       { $set: userField },
       { new: true }
     ).select("-password");
+    profile = await Profile.findOneAndUpdate(
+      { user: req.user.id },
+      { $set: userField },
+      { new: true }
+    );
+
+
 
     res.status(200).json({
       message: "Images Uploaded Succefully",
       data: urls,
-      updatedUser: user,
+      updatedProfile: profile,
     });
   } catch (error) {
     res.status(405).json({
