@@ -34,8 +34,11 @@ const PostSchema = new Schema({
     require: true,
   },
   image: {
-    type: String,
+    type: [String],
     default: null,
+  },
+  location: {
+    type: String,
   },
   likes: [
     {
