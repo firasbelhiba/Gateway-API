@@ -811,6 +811,7 @@ router.put("/follow/:id", auth, async (req, res) => {
     newFollowing.profile = req.params.id;
     newFollowing.name = followedProfile.name;
     newFollowing.avatar = followedProfile.avatar;
+    newFollowing.state = true;
 
     newFollower = {};
 

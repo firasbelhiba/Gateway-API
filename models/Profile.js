@@ -72,7 +72,8 @@ const ProfileSchema = new mongoose.Schema({
       },
       avatar: {
         type: String
-      }
+      },
+      state: { type: Boolean, default: false }
     },
   ],
   reports: [
