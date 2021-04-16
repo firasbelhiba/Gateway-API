@@ -8,6 +8,17 @@ const { check, validationResult } = require("express-validator/check");
 const upload = require("../../middleware/multer");
 const fs = require("fs");
 const cloudinary = require("../../utils/cloudinary");
+const nodemailer = require("nodemailer");
+const sendgridTransport = require("nodemailer-sendgrid-transport");
+const config = require("config");
+
+const transporter = nodemailer.createTransport(
+  sendgridTransport({
+    auth: {
+      api_key: config.get("mail_api_key"),
+    },
+  })
+);
 
 //@author Ghada Khedri
 //@route POST api/posts/
@@ -478,6 +489,38 @@ router.put("/view/:id", auth, async (req, res) => {
     post.views.unshift({ user: req.user.id });
     await post.save();
     res.json(post.views);
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
+
+//@author Ghada Khedri
+//@route POST api/posts/mail/:id
+//@desc send a post
+//@access Private
+router.post("/mail/:id", auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    const user = await User.findById(req.user.id).select("-password");
+    if (!post) {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+
+    await transporter.sendMail({
+      to: req.body.email,
+      from: "gatewayjustcode@gmail.com",
+      subject: post.title,
+      html: `<h1> This post is sent by : ${user.name}</h1>
+      <p>${req.body.message}</p>
+      <p>${post.text}</p>
+      <img src=${post.image} alt=""/>      `,
+    });
+
+    res.status(200).json({ message: "email sent with success !!" });
   } catch (error) {
     console.error(error.message);
     if (error.kind === "ObjectId") {
