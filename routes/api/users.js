@@ -5,6 +5,14 @@ const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
 const saltRounds = 10;
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+const sendgridTransport = require('nodemailer-sendgrid-transport');
+
+const transporter = nodemailer.createTransport(sendgridTransport({
+    auth: {
+        api_key: config.get('mail_api_key')
+    }
+}));
 
 
 
@@ -14,11 +22,6 @@ const User = require('../../models/User');
 
 const router = express.Router();
 
-//@author Firas Belhiba
-//@Route GET api/users
-// @Description  Test route 
-// @Access Public 
-//router.get('/', (req, res) => res.send('Users route '));
 
 
 //@author Firas Belhiba
@@ -73,6 +76,15 @@ router.post('/', [
 
         await user.save();
 
+        console.log(user.email)
+
+        await transporter.sendMail({
+            to: user.email,
+            from: "gatewayjustcode@gmail.com",
+            subject: "Sign up success",
+            html: "<h1>Welcome to Gateway</h1>"
+        })
+
         // Get the token
         const payload = {
             user: {
@@ -91,6 +103,9 @@ router.post('/', [
         res.status(500).send('Server error');
     }
 });
+
+
+
 
 
 
