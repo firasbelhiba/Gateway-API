@@ -38,7 +38,8 @@ router.post(
       for (const file of files) {
         const { path } = file;
         const newPath = await uploader(path);
-        urls.push(newPath);
+        urls.push(newPath.url);
+
         fs.unlinkSync(path);
       }
 
@@ -46,7 +47,7 @@ router.post(
         user: req.user.id,
         title: req.body.title,
         text: req.body.text,
-        image: urls[0].url,
+        image: urls,
         avatar: user.avatar,
         name: user.name,
         category: req.body.category,
