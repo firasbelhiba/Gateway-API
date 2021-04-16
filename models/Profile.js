@@ -122,7 +122,7 @@ const ProfileSchema = new mongoose.Schema({
         require: true,
       },
       image: {
-        type: String,
+        type: [String],
         default: null,
       },
       likes: [
