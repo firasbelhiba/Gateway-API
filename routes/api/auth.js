@@ -7,6 +7,8 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
+const saltRounds = 10;
+
 
 const transporter = nodemailer.createTransport(sendgridTransport({
     auth: {
@@ -144,6 +146,60 @@ router.post('/reset-password',
 
     })
 
+
+//@author Firas Belhiba
+//@Route POST api/auth/new-password
+// @Description  New password route 
+// @Access Public
+router.post('/new-password',
+    [
+        check('password', 'Please enter a password with at least 6 characters').isLength({
+            min: 6
+        })
+    ],
+    async (req, res) => {
+
+        const errors = validationResult(req);
+        if (!errors) {
+            return res.status(400).json({ errors: errors.array() })
+        }
+
+        try {
+
+            const newPassword = req.body.password
+            const sentToken = req.body.token
+
+            let user = await User.findOne({ resetToken: sentToken, expireToken: { $gt: Date.now() } });
+
+            if (!user) {
+                res.status(400).
+                    json({
+                        errors:
+                            [{ message: 'Session has been expired , please resend another Forget your password email' }]
+                    });
+            };
+
+
+            // Password encryption
+            const salt = await bcrypt.genSalt(saltRounds);
+
+            // I added the toString() otherwise it didn't work thanks to : https://github.com/bradtraversy/nodeauthapp/issues/7
+            user.password = await bcrypt.hash(newPassword.toString(), salt);
+
+            user.resetToken = undefined;
+            user.expireToken = undefined;
+
+            await user.save();
+
+            res.json({ message: "password updated succefully" });
+
+
+        } catch (error) {
+            console.error(error.message);
+            res.status(500).send('Server error');
+        }
+
+    });
 
 
 module.exports = router;
