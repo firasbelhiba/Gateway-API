@@ -17,13 +17,15 @@ const UserSchema = new mongoose.Schema({
     avatar: {
         type: String
     },
+    resetToken: {
+        type: String,
+    },
+    expireToken: {
+        type: Date,
+    },
     date: {
         type: Date,
         default: Date.now
-    },
-    resetPasswordLink: {
-        data: String,
-        default: ""
     }
 });
 
