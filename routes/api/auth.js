@@ -129,7 +129,7 @@ router.post('/reset-password',
                     `
                 <p>You requested for password reset</p>
                 <h5>click in this 
-                <a href="http://localhost:3000/reset-password?id=${token}">
+                <a href="http://localhost:3000/new-password?id=${token}">
                 link
                 </a> to reset your password
                 </h5>
