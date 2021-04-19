@@ -282,6 +282,7 @@ router.put(
     [
       check("text", "Text is required").not().isEmpty(),
       check("title", "Title is required").not().isEmpty(),
+      check("category", "category is required ").not().isEmpty(),
     ],
   ],
   async (req, res) => {
