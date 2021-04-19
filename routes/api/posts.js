@@ -616,4 +616,31 @@ router.put("/hide/:id", auth, async (req, res) => {
   }
 });
 
+//@author Ghada Khedri
+//@route DELETE api/posts/unhide/:id
+//@desc Unhide a post
+//@access Private
+router.delete("/unhide/:id", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    const profile = await Profile.findOne({ user: user._id });
+
+    //Get index
+    const removeIndex = profile.hidden_post
+      .map((hide) => hide.post.toString())
+      .indexOf(req.params.id);
+
+    profile.hidden_post.splice(removeIndex, 1);
+    await profile.save();
+
+    res.json(profile.hidden_post);
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
+
 module.exports = router;
