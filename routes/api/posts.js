@@ -545,6 +545,14 @@ router.put("/save/:id", auth, async (req, res) => {
       return res.status(404).json({ message: "Post not Found " });
     }
 
+    //Check if the post is already saved by the user
+    if (
+      profile.saved_post.filter((p) => p.post.toString() === req.params.id)
+        .length > 0
+    ) {
+      return res.status(400).json({ message: "Post already saved !" });
+    }
+
     const newSave = {
       post: req.params.id,
       user: req.user.id,
@@ -560,6 +568,45 @@ router.put("/save/:id", auth, async (req, res) => {
     await profile.save();
 
     res.json(profile.saved_post);
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
+
+//@author Ghada Khedri
+//@route PUT api/posts/hide/:id
+//@desc hide post
+//@access Private
+router.put("/hide/:id", auth, async (req, res) => {
+  try {
+    const post = await Post.findOne({ _id: req.params.id });
+    const user = await User.findById(req.user.id).select("-password");
+    const profile = await Profile.findOne({ user: user._id });
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+
+    //Check if the post is already hidden by the user
+    if (
+      profile.hidden_post.filter((p) => p.post.toString() === req.params.id)
+        .length > 0
+    ) {
+      return res.status(400).json({ message: "Post already hidden !" });
+    }
+
+    const newHide = {
+      post: req.params.id,
+    };
+
+    profile.hidden_post.unshift(newHide);
+    await profile.save();
+
+    res.json(profile.hidden_post);
   } catch (error) {
     console.error(error.message);
     if (error.kind === "ObjectId") {
