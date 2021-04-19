@@ -354,6 +354,14 @@ const ProfileSchema = new mongoose.Schema({
       type: String,
     },
   },
+  views: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+      },
+    },
+  ],
   date: {
     type: Date,
     default: Date.now,
