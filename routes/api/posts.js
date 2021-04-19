@@ -282,6 +282,7 @@ router.put(
     [
       check("text", "Text is required").not().isEmpty(),
       check("title", "Title is required").not().isEmpty(),
+      check("category", "category is required ").not().isEmpty(),
     ],
   ],
   async (req, res) => {
@@ -500,7 +501,7 @@ router.put("/view/:id", auth, async (req, res) => {
 
 //@author Ghada Khedri
 //@route POST api/posts/mail/:id
-//@desc send a post
+//@desc send a post by email
 //@access Private
 router.post("/mail/:id", auth, async (req, res) => {
   try {
@@ -521,6 +522,118 @@ router.post("/mail/:id", auth, async (req, res) => {
     });
 
     res.status(200).json({ message: "email sent with success !!" });
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
+
+//@author Ghada Khedri
+//@route PUT api/posts/save/:id
+//@desc save post
+//@access Private
+router.put("/save/:id", auth, async (req, res) => {
+  try {
+    const post = await Post.findOne({ _id: req.params.id });
+    const user = await User.findById(req.user.id).select("-password");
+    const profile = await Profile.findOne({ user: user._id });
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+
+    //Check if the post is already saved by the user
+    if (
+      profile.saved_post.filter((p) => p.post.toString() === req.params.id)
+        .length > 0
+    ) {
+      return res.status(400).json({ message: "Post already saved !" });
+    }
+
+    const newSave = {
+      post: req.params.id,
+      user: req.user.id,
+      title: post.title,
+      text: post.text,
+      name: post.name,
+      avatar: post.avatar,
+      category: post.category,
+      image: post.image,
+    };
+
+    profile.saved_post.unshift(newSave);
+    await profile.save();
+
+    res.json(profile.saved_post);
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
+
+//@author Ghada Khedri
+//@route PUT api/posts/hide/:id
+//@desc hide post
+//@access Private
+router.put("/hide/:id", auth, async (req, res) => {
+  try {
+    const post = await Post.findOne({ _id: req.params.id });
+    const user = await User.findById(req.user.id).select("-password");
+    const profile = await Profile.findOne({ user: user._id });
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+
+    //Check if the post is already hidden by the user
+    if (
+      profile.hidden_post.filter((p) => p.post.toString() === req.params.id)
+        .length > 0
+    ) {
+      return res.status(400).json({ message: "Post already hidden !" });
+    }
+
+    const newHide = {
+      post: req.params.id,
+    };
+
+    profile.hidden_post.unshift(newHide);
+    await profile.save();
+
+    res.json(profile.hidden_post);
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
+
+//@author Ghada Khedri
+//@route DELETE api/posts/unhide/:id
+//@desc Unhide a post
+//@access Private
+router.delete("/unhide/:id", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    const profile = await Profile.findOne({ user: user._id });
+
+    //Get index
+    const removeIndex = profile.hidden_post
+      .map((hide) => hide.post.toString())
+      .indexOf(req.params.id);
+
+    profile.hidden_post.splice(removeIndex, 1);
+    await profile.save();
+
+    res.json(profile.hidden_post);
   } catch (error) {
     console.error(error.message);
     if (error.kind === "ObjectId") {
