@@ -2,6 +2,9 @@ const express = require("express");
 const connectDB = require("./config/db");
 const http = require("http");
 
+const Chat = require('./models/Chat');
+
+
 
 
 const socketIo = require("socket.io");
@@ -73,19 +76,48 @@ const PORT = process.env.PORT || 5000;
 
 //This is the Chat code 
 
-io.on('connection', (socket) => {
-  /* socket object may be used to send specific messages to the new connected client */
-  console.log('new client connected');
-  socket.emit('connection', "dali");
+// io.on('connection', (socket) => {
+//   /* socket object may be used to send specific messages to the new connected client */
+//   console.log('new client connected');
+//   socket.emit('connection', "bena");
 
-  socket.on('join', (data) => {
-    console.log("this is the name", data)
-  })
+//   socket.on('message', (data) => {
+//     // console.log(
+//     //   "this is the message", data.message,
+//     //   "and this is the sender id", data.senderId,
+//     //   "and this is the recipient id", data.recipientId)
 
-  socket.on('disconnect', () => {
-    console.log('user had left !!!')
+//     const { message, senderId, recipientId } = data;
+
+//     chat = new Chat({
+//       message,
+//       senderId,
+//       recipientId
+//     });
+
+//     chat.save();
+//     console.log('message registered in db');
+//     socket.broadcast.emit('chat-message', chat);
+//   })
+// });
+
+io.on('connection', socket => {
+  // socket.emit('chat-message', 'hello world');
+  socket.on('send-chat-message', data => {
+    socket.broadcast.emit('chat-message', data);
+    const { message, senderId, recipientId } = data;
+
+    chat = new Chat({
+      message,
+      senderId,
+      recipientId
+    });
+
+    //chat.save();
+    console.log('message registered in db');
   })
-});
+})
+
 
 
 server.listen(PORT, () => console.log(`Server started on port ${PORT}`));
