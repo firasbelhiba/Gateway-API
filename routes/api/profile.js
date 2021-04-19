@@ -1108,4 +1108,65 @@ router.post("/cover", [upload.array("image"), auth], async (req, res) => {
   }
 });
 
+//@author Firas Belhiba
+//@route POST api/profile/portfolio
+//@desc add portfolio
+//@access private
+router.post("/portfolio", [
+  auth,
+  [
+    check("title", "Title is required ").not().isEmpty(),
+    check("description", "Description is required ").not().isEmpty(),
+  ],
+  upload.array("image"),
+], async (req, res) => {
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  try {
+
+    const uploader = async (path) => await cloudinary.uploads(path, "Images");
+
+    const urls = [];
+
+    const files = req.files;
+
+    for (const file of files) {
+      const { path } = file;
+      const newPath = await uploader(path);
+      urls.push(newPath);
+      fs.unlinkSync(path);
+    }
+
+    const {
+      title,
+      description,
+    } = req.body;
+
+    const newPortfolio = {
+      title: title,
+      description: description,
+      image: urls[0].url
+    };
+
+
+    const profile = await Profile.findOne({ user: req.user.id });
+
+    // unshift it push in the begging rather than the end
+    profile.portfolio.unshift(newPortfolio);
+
+    await profile.save();
+
+    res.json(profile);
+
+
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server error");
+  }
+});
+
 module.exports = router;

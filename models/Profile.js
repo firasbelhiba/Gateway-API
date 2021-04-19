@@ -362,6 +362,21 @@ const ProfileSchema = new mongoose.Schema({
       },
     },
   ],
+  portfolio: [
+    {
+      title: {
+        type: String,
+        require: true,
+      },
+      description: {
+        type: String,
+        require: true,
+      },
+      image: {
+        type: [String],
+      }
+    },
+  ],
   date: {
     type: Date,
     default: Date.now,
