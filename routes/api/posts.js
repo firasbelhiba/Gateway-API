@@ -501,7 +501,7 @@ router.put("/view/:id", auth, async (req, res) => {
 
 //@author Ghada Khedri
 //@route POST api/posts/mail/:id
-//@desc send a post
+//@desc send a post by email
 //@access Private
 router.post("/mail/:id", auth, async (req, res) => {
   try {
@@ -522,6 +522,44 @@ router.post("/mail/:id", auth, async (req, res) => {
     });
 
     res.status(200).json({ message: "email sent with success !!" });
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
+
+//@author Ghada Khedri
+//@route PUT api/posts/save/:id
+//@desc save post
+//@access Private
+router.put("/save/:id", auth, async (req, res) => {
+  try {
+    const post = await Post.findOne({ _id: req.params.id });
+    const user = await User.findById(req.user.id).select("-password");
+    const profile = await Profile.findOne({ user: user._id });
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+
+    const newSave = {
+      post: req.params.id,
+      user: req.user.id,
+      title: post.title,
+      text: post.text,
+      name: post.name,
+      avatar: post.avatar,
+      category: post.category,
+      image: post.image,
+    };
+
+    profile.saved_post.unshift(newSave);
+    await profile.save();
+
+    res.json(profile.saved_post);
   } catch (error) {
     console.error(error.message);
     if (error.kind === "ObjectId") {

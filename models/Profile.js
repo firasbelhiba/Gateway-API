@@ -54,11 +54,11 @@ const ProfileSchema = new mongoose.Schema({
         ref: "profile",
       },
       name: {
-        type: String
+        type: String,
       },
       avatar: {
-        type: String
-      }
+        type: String,
+      },
     },
   ],
   following: [
@@ -68,12 +68,12 @@ const ProfileSchema = new mongoose.Schema({
         ref: "profile",
       },
       name: {
-        type: String
+        type: String,
       },
       avatar: {
-        type: String
+        type: String,
       },
-      state: { type: Boolean, default: false }
+      state: { type: Boolean, default: false },
     },
   ],
   reports: [
@@ -170,6 +170,45 @@ const ProfileSchema = new mongoose.Schema({
           },
         },
       ],
+      date: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
+  saved_post: [
+    {
+      post: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "post",
+      },
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+      },
+      title: {
+        type: String,
+        require: true,
+      },
+      text: {
+        type: String,
+        require: true,
+      },
+      name: {
+        type: String,
+      },
+      avatar: {
+        type: String,
+      },
+      category: {
+        type: String,
+        enum: Object.values(category),
+        require: true,
+      },
+      image: {
+        type: [String],
+        default: null,
+      },
       date: {
         type: Date,
         default: Date.now,
