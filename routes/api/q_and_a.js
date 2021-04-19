@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require("../../models/User");
 const Question = require("../../models/Question");
-const Answer = require("../../models/Answer");
-const Reply = require("../../models/Reply");
+
 
 //@author Motez Ayari
 //@Route GET api/users
@@ -72,5 +71,41 @@ router.post('/add', (req, res) => {
         });
     }
 )
+// add Answer
+router.post('/answer/:id', (req, res) => {
+        Question.findById(req.params.id).then(Question => {
+            const newAnswer = {
+                user: req.body.user,
+                description: req.body.description,
+                date: req.body.date,
+            };
 
+            Question.answers.push(newAnswer);
+
+            Question.save().then(() => {
+                res.json('Answer Added!');
+            }).catch(err => {
+                res.status(400).json('error: ' + err);
+            })
+        }).catch(err => res.status(400).json('error: ' + err));
+    }
+);
+
+// add reply
+router.post('/:idQ/reply/:idA', (req, res) => {
+        Question.findById(req.params.idQ).then(Question => {
+            const newReply = {
+                user: req.body.user,
+                description: req.body.description,
+                date: req.body.date,
+            };
+            Question.answers.find((answer) => answer.id === req.params.idA).replies.push(newReply);
+            Question.save().then(() => {
+                res.json('Reply Added!');
+            }).catch(err => {
+                res.status(400).json('error: ' + err);
+            })
+        }).catch(err => res.status(400).json('error: ' + err));
+    }
+);
 module.exports = router;
