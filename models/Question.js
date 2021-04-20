@@ -40,6 +40,10 @@ const QuestionSchema = new Schema({
             },
         },
     ],
+    solved: {
+        type: Boolean,
+        default: false,
+    },
     reports: [
         {
             user: {
@@ -63,6 +67,10 @@ const QuestionSchema = new Schema({
             date: {
                 type: Date,
                 default: Date.now,
+            },
+            solution: {
+                type: Boolean,
+                default: false,
             },
             replies: [
                 {

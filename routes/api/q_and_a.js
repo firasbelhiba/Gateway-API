@@ -109,3 +109,21 @@ router.post('/:idQ/reply/:idA', (req, res) => {
     }
 );
 module.exports = router;
+
+// add solution
+router.post('/:idQ/solve/:idA', (req, res) => {
+        Question.findById(req.params.idQ).then(Question => {
+            Question.solved = !Question.solved;
+            Question.answers.find((answer) => answer.id === req.params.idA).solution
+                = !Question.answers.find((answer) => answer.id === req.params.idA).solution;
+
+            Question.save().then(() => {
+                console.log('Solution Added!');
+                res.json('Solution Added!');
+            }).catch(err => {
+                res.status(400).json('error: ' + err);
+            })
+        }).catch(err => res.status(400).json('error: ' + err));
+    }
+);
+module.exports = router;
