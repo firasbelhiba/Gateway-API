@@ -65,10 +65,14 @@ router.post('/add', (req, res) => {
             date,
         });
         newQuestion.save().then(() => {
-            res.send('Question added');
+            Question.find().then(Questions =>
+                res.json(Questions)
+            ).catch(err =>
+                res.status(400).json('error: ' + err)
+            );
         }).catch(err => {
-            res.status(400).json('error:' + err);
-        });
+            res.status(400).json('error: ' + err);
+        })
     }
 )
 // add Answer
@@ -83,7 +87,7 @@ router.post('/answer/:id', (req, res) => {
             Question.answers.push(newAnswer);
 
             Question.save().then(() => {
-                res.json('Answer Added!');
+                res.json(Question);
             }).catch(err => {
                 res.status(400).json('error: ' + err);
             })
@@ -101,14 +105,13 @@ router.post('/:idQ/reply/:idA', (req, res) => {
             };
             Question.answers.find((answer) => answer.id === req.params.idA).replies.push(newReply);
             Question.save().then(() => {
-                res.json('Reply Added!');
+                res.json(Question);
             }).catch(err => {
                 res.status(400).json('error: ' + err);
             })
         }).catch(err => res.status(400).json('error: ' + err));
     }
 );
-module.exports = router;
 
 // add solution
 router.post('/:idQ/solve/:idA', (req, res) => {
@@ -118,12 +121,29 @@ router.post('/:idQ/solve/:idA', (req, res) => {
                 = !Question.answers.find((answer) => answer.id === req.params.idA).solution;
 
             Question.save().then(() => {
-                console.log('Solution Added!');
-                res.json('Solution Added!');
+                res.json(Question);
             }).catch(err => {
                 res.status(400).json('error: ' + err);
             })
         }).catch(err => res.status(400).json('error: ' + err));
     }
 );
+
+// add solution
+router.post('/:idQ/vote/:idU', (req, res) => {
+        Question.findById(req.params.idQ).then(Question => {
+            const vote = {
+                user: req.params.idU,
+            }
+            Question.votes.push(vote);
+
+            Question.save().then(() => {
+                res.json(Question);
+            }).catch(err => {
+                res.status(400).json('error: ' + err);
+            })
+        }).catch(err => res.status(400).json('error: ' + err));
+    }
+);
+
 module.exports = router;
