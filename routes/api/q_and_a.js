@@ -130,14 +130,32 @@ router.post('/:idQ/solve/:idA', (req, res) => {
 );
 
 // add solution
-router.post('/:idQ/vote/:idU', (req, res) => {
+router.post('/:idQ/upVote/:idU', (req, res) => {
         Question.findById(req.params.idQ).then(Question => {
             const vote = {
                 user: req.params.idU,
             }
-            Question.votes.push(vote);
+            Question.upVotes.push(vote);
 
             Question.save().then(() => {
+                console.log('voted');
+                res.json(Question.upVotes);
+            }).catch(err => {
+                res.status(400).json('error: ' + err);
+            })
+        }).catch(err => res.status(400).json('error: ' + err));
+    }
+);
+router.post('/:idQ/cancelUpVote/:idU', (req, res) => {
+        Question.findById(req.params.idQ).then(Question => {
+            const removeIndex = Question.upVotes
+                .map((upVote) => upVote.user.toString())
+                .indexOf(req.params.idU);
+
+            Question.upVotes.splice(removeIndex, 1);
+
+            Question.save().then(() => {
+                console.log('voted canceled');
                 res.json(Question);
             }).catch(err => {
                 res.status(400).json('error: ' + err);
@@ -145,5 +163,41 @@ router.post('/:idQ/vote/:idU', (req, res) => {
         }).catch(err => res.status(400).json('error: ' + err));
     }
 );
+
+router.post('/:idQ/downVote/:idU', (req, res) => {
+        Question.findById(req.params.idQ).then(Question => {
+            const vote = {
+                user: req.params.idU,
+            }
+            Question.downVotes.push(vote);
+
+            Question.save().then(() => {
+                console.log('downvoted');
+                res.json(Question);
+            }).catch(err => {
+                res.status(400).json('error: ' + err);
+            })
+        }).catch(err => res.status(400).json('error: ' + err));
+    }
+);
+router.post('/:idQ/cancelDownVote/:idU', (req, res) => {
+        Question.findById(req.params.idQ).then(Question => {
+
+            const removeIndex = Question.downVotes
+                .map((downVote) => downVote.user.toString())
+                .indexOf(req.params.idU);
+
+            Question.downVotes.splice(removeIndex, 1);
+
+            Question.save().then(() => {
+                console.log('downvote canceled');
+                res.json(Question);
+            }).catch(err => {
+                res.status(400).json('error: ' + err);
+            })
+        }).catch(err => res.status(400).json('error: ' + err));
+    }
+);
+
 
 module.exports = router;

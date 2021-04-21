@@ -24,7 +24,15 @@ const QuestionSchema = new Schema({
             require: true,
         },
     ],
-    votes: [
+    upVotes: [
+        {
+            user: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "user",
+            },
+        },
+    ],
+    downVotes: [
         {
             user: {
                 type: mongoose.Schema.Types.ObjectId,
