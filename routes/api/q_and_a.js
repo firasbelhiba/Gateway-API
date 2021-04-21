@@ -199,5 +199,21 @@ router.post('/:idQ/cancelDownVote/:idU', (req, res) => {
     }
 );
 
+router.post('/:idQ/answerReport/:idA', (req, res) => {
+        Question.findById(req.params.idQ).then(Question => {
+            const newReport = {
+                user: req.body.user,
+                reason: req.body.reason,
+            };
+            Question.answers.find((answer) => answer.id === req.params.idA).reports.push(newReport);
+
+            Question.save().then(() => {
+                res.json(Question);
+            }).catch(err => {
+                res.status(400).json('error: ' + err);
+            })
+        }).catch(err => res.status(400).json('error: ' + err));
+    }
+);
 
 module.exports = router;

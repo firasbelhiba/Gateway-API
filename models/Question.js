@@ -80,6 +80,17 @@ const QuestionSchema = new Schema({
                 type: Boolean,
                 default: false,
             },
+            reports: [
+                {
+                    user: {
+                        type: mongoose.Schema.Types.ObjectId,
+                        ref: "user",
+                    },
+                    reason: {
+                        type: String,
+                    },
+                },
+            ],
             replies: [
                 {
                     user: {
