@@ -25,8 +25,13 @@ router.get('/:id', (req, res) => {
 
 //DeleteQuestion
 router.delete('/delete/:id', (req, res) => {
-        Question.findByIdAndDelete(req.params.id).then(() => res.json('Question Deleted'))
-            .catch(err => res.status(400).json('error: ' + err));
+        Question.findByIdAndDelete(req.params.id).then(
+            Question.find().then(Questions =>
+                res.json(Questions))
+                .catch(err =>
+                    res.status(400).json('error: ' + err)
+                )
+                .catch(err => res.status(400).json('error: ' + err)));
     }
 );
 
@@ -213,6 +218,12 @@ router.post('/:idQ/answerReport/:idA', (req, res) => {
                 res.status(400).json('error: ' + err);
             })
         }).catch(err => res.status(400).json('error: ' + err));
+    }
+);
+
+router.post('idQ/delete/:idA', (req, res) => {
+
+        console.log('hello')
     }
 );
 
