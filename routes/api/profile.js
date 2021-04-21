@@ -4,6 +4,9 @@ const config = require("config");
 const router = express.Router();
 const { check, validationResult } = require("express-validator/check");
 
+
+
+
 const auth = require("../../middleware/auth");
 const Profile = require("../../models/Profile");
 const User = require("../../models/User");
@@ -1168,5 +1171,10 @@ router.post("/portfolio", [
     res.status(500).send("Server error");
   }
 });
+
+
+
+
+
 
 module.exports = router;

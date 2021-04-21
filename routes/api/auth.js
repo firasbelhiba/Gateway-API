@@ -202,4 +202,48 @@ router.post('/new-password',
     });
 
 
+//@author Firas Belhiba
+//@Route POST api/auth/change-password
+// @Description  Change password 
+// @Access Private  
+router.post('/change-password', [
+    [check('email', 'Please enter a valid email').isEmail(),
+    check('password', 'Password is required').exists()], auth
+], async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors) {
+        return res.status(400).json({ errors: errors.array() })
+    }
+
+    const { oldPassword, password } = req.body;
+
+    const user = await User.findById(req.user.id);
+
+
+    try {
+
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+
+        if (!isMatch) {
+            res.status(400).json({ errors: [{ message: 'Invalid paramaters , try again !' }] });
+        }
+
+        const salt = await bcrypt.genSalt(saltRounds);
+
+        user.password = await bcrypt.hash(password.toString(), salt);
+
+        await user.save();
+
+        res.json({ message: "Password changed succefully" });
+
+        console.log(password)
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server error');
+    }
+
+});
+
+
+
 module.exports = router;
