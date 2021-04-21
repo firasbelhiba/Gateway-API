@@ -24,7 +24,15 @@ const QuestionSchema = new Schema({
             require: true,
         },
     ],
-    votes: [
+    upVotes: [
+        {
+            user: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "user",
+            },
+        },
+    ],
+    downVotes: [
         {
             user: {
                 type: mongoose.Schema.Types.ObjectId,
@@ -40,6 +48,10 @@ const QuestionSchema = new Schema({
             },
         },
     ],
+    solved: {
+        type: Boolean,
+        default: false,
+    },
     reports: [
         {
             user: {
@@ -64,6 +76,21 @@ const QuestionSchema = new Schema({
                 type: Date,
                 default: Date.now,
             },
+            solution: {
+                type: Boolean,
+                default: false,
+            },
+            reports: [
+                {
+                    user: {
+                        type: mongoose.Schema.Types.ObjectId,
+                        ref: "user",
+                    },
+                    reason: {
+                        type: String,
+                    },
+                },
+            ],
             replies: [
                 {
                     user: {
