@@ -54,6 +54,12 @@ const PostSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",
       },
+      name: {
+        type: String,
+      },
+      avatar: {
+        type: String,
+      },
     },
   ],
   reports: [

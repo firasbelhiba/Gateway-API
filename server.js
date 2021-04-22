@@ -2,14 +2,9 @@ const express = require("express");
 const connectDB = require("./config/db");
 const http = require("http");
 
-const Chat = require('./models/Chat');
-
-
-
+const Chat = require("./models/Chat");
 
 const socketIo = require("socket.io");
-
-
 
 //Connect Database
 connectDB();
@@ -17,16 +12,14 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 var allowedOrigins = "http://localhost:* http://127.0.0.1:*";
-var path = '/*'; // you need this if you want to connect to something other than the default socket.io path
+var path = "/*"; // you need this if you want to connect to something other than the default socket.io path
 
 var io = socketIo(server, {
   cors: {
     origins: allowedOrigins,
     path: path,
-  }
+  },
 });
-
-
 
 app.get("/", async (req, res) => {
   console.log("API is running");
@@ -66,15 +59,9 @@ app.use("/api/q_and_a", require("./routes/api/q_and_a"));
 app.use("/api/jobs", require("./routes/api/jobs"));
 app.use("/api/chat", require("./routes/api/chat"));
 
-
-
-
 const PORT = process.env.PORT || 5000;
 
-
-
-
-//This is the Chat code 
+//This is the Chat code
 
 // io.on('connection', (socket) => {
 //   /* socket object may be used to send specific messages to the new connected client */
@@ -101,31 +88,23 @@ const PORT = process.env.PORT || 5000;
 //   })
 // });
 
-io.on('connection', socket => {
+io.on("connection", (socket) => {
   // socket.emit('chat-message', 'hello world');
-  socket.on('send-chat-message', data => {
-    socket.broadcast.emit('chat-message', data);
+  socket.on("send-chat-message", (data) => {
+    socket.broadcast.emit("chat-message", data);
     const { message, senderId, recipientId } = data;
 
     chat = new Chat({
       message,
       senderId,
-      recipientId
+      recipientId,
     });
 
     //chat.save();
-    console.log('message registered in db');
-  })
-})
-
-
+    console.log("message registered in db");
+  });
+});
 
 server.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 
-
-
-
 module.exports = server;
-
-
-
