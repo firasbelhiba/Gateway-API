@@ -477,6 +477,7 @@ router.delete("/shared/:id/:id_share", auth, async (req, res) => {
 //@access Private
 router.put("/view/:id", auth, async (req, res) => {
   try {
+    const user = await User.findById(req.user.id);
     const post = await Post.findById(req.params.id);
 
     //Check if the view is already there
@@ -487,7 +488,12 @@ router.put("/view/:id", auth, async (req, res) => {
       return res.status(400).json({ message: "Post already viewed !" });
     }
 
-    post.views.unshift({ user: req.user.id });
+    post.views.unshift({
+      user: req.user.id,
+      name: user.name,
+      avatar: user.avatar,
+    });
+
     await post.save();
     res.json(post.views);
   } catch (error) {
@@ -643,4 +649,23 @@ router.delete("/unhide/:id", auth, async (req, res) => {
   }
 });
 
+//Admin
+//@author Ghada Khedri
+//@route DELETE api/posts/:id
+//@desc DELETE by id post
+//@access Private
+
+router.delete("/admin/:id", async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    await post.remove();
+    res.json({ message: "Post Deleted" });
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
 module.exports = router;
