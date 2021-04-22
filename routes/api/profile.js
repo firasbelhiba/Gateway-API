@@ -1174,6 +1174,35 @@ router.post("/portfolio", [
 
 
 
+//@author Firas Belhiba
+//@route POST api/profile/notification
+//@desc Notify
+//@access Private
+router.post("/notification", auth, async (req, res) => {
+  try {
+    const profile = await Profile.findOne({ user: req.user.id });
+
+
+    profile.notification.unshift({ message: req.body.message });
+
+    await profile.save();
+
+    res.json(profile.notification);
+  } catch (error) {
+    console.error(error.message);
+
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+
+    res.status(500).send("Server error");
+  }
+});
+
+
+
+
+
 
 
 

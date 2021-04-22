@@ -377,6 +377,17 @@ const ProfileSchema = new mongoose.Schema({
       }
     },
   ],
+  notification: [
+    {
+      message: {
+        type: String,
+      },
+      date: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+  ],
   date: {
     type: Date,
     default: Date.now,

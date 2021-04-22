@@ -46,6 +46,17 @@ const PostSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",
       },
+      name: {
+        type: String,
+      },
+      avatar: {
+        type: String,
+      },
+      date: {
+        type: Date,
+        default: Date.now,
+      },
+
     },
   ],
   views: [
@@ -59,6 +70,10 @@ const PostSchema = new Schema({
       },
       avatar: {
         type: String,
+      },
+      date: {
+        type: Date,
+        default: Date.now,
       },
     },
   ],
