@@ -8,6 +8,7 @@ const Chat = require('./models/Chat');
 
 
 const socketIo = require("socket.io");
+const passport = require("passport");
 
 
 
@@ -26,7 +27,9 @@ var io = socketIo(server, {
   }
 });
 
+app.use(passport.initialize());
 
+app.use(passport.session());
 
 app.get("/", async (req, res) => {
   console.log("API is running");
