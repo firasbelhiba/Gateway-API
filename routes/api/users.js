@@ -7,6 +7,11 @@ const saltRounds = 10;
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
+const passport = require('passport');
+const cookieSession = require('cookie-session');
+
+
+require('../../utils/google-passeport-setup');
 
 const transporter = nodemailer.createTransport(sendgridTransport({
     auth: {
@@ -18,10 +23,81 @@ const transporter = nodemailer.createTransport(sendgridTransport({
 
 const User = require('../../models/User');
 
+var newUser = "";
+
 
 
 const router = express.Router();
 
+//@author Firas Belhiba
+//@Route get api/users/google
+// @Description  google auth form 
+// @Access Public 
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
+
+
+router.get('/callback', passport.authenticate('google', { failureRedirect: '/failed' }),
+    function (req, res) {
+        newUser = { name: req.user.displayName, pic: req.user.photos[0].value, email: req.user.emails[0].value }
+        res.redirect('http://localhost:3000/login-with-google');
+    }
+);
+
+
+//@author Firas Belhiba
+//@Route get api/users/google
+// @Description  Register with google
+// @Access Public 
+router.post('/register-with-google', async (req, res) => {
+    // console.log("this is your profile", { name: req.user.displayName, pic: req.user.photos[0].value, email: req.user.emails[0].value });
+    try {
+        // Check user if already exist 
+        let user = await User.findOne({ email: newUser.email });
+
+
+        if (user) {
+            res.status(400).json({ errors: [{ message: 'User already exists' }] });
+        }
+
+        user = new User({
+            name: newUser.name,
+            email: newUser.email,
+            avatar: newUser.avatar,
+            password: req.body.password
+        });
+
+        // Password encryption
+        const salt = await bcrypt.genSalt(saltRounds);
+
+        // I added the toString() otherwise it didn't work thanks to : https://github.com/bradtraversy/nodeauthapp/issues/7
+        user.password = await bcrypt.hash(req.body.password.toString(), salt);
+
+        await user.save();
+
+        await transporter.sendMail({
+            to: user.email,
+            from: "gatewayjustcode@gmail.com",
+            subject: "Sign up success",
+            html: "<h1>Welcome to Gateway</h1>"
+        })
+
+        // Get the token
+        const payload = {
+            user: {
+                id: user.id
+            }
+        }
+
+        jwt.sign(payload, config.get('jwtSecret'), { expiresIn: 36000000 }, (err, token) => {
+            if (err) throw err;
+            res.json({ token });
+        })
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server error');
+    }
+})
 
 
 //@author Firas Belhiba

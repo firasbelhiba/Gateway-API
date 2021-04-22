@@ -5,6 +5,7 @@ const http = require("http");
 const Chat = require("./models/Chat");
 
 const socketIo = require("socket.io");
+const passport = require("passport");
 
 //Connect Database
 connectDB();
@@ -20,6 +21,10 @@ var io = socketIo(server, {
     path: path,
   },
 });
+
+app.use(passport.initialize());
+
+app.use(passport.session());
 
 app.get("/", async (req, res) => {
   console.log("API is running");
