@@ -141,8 +141,6 @@ router.delete("/:id", auth, async (req, res) => {
 router.put("/like/:id", auth, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-    const user = await User.findById(req.user.id).select("-password");
-
 
     //Check if the post is already liked by the user
     if (
@@ -151,7 +149,7 @@ router.put("/like/:id", auth, async (req, res) => {
     ) {
       return res.status(400).json({ message: "Post already liked !" });
     }
-    post.likes.unshift({ user: req.user.id, name: user.name, avatar: user.avatar });
+    post.likes.unshift({ user: req.user.id, name: post.name, avatar: post.avatar });
     await post.save();
     res.json(post.likes);
   } catch (error) {
@@ -508,7 +506,6 @@ router.put("/view/:id", auth, async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
 
 //@author Ghada Khedri
 //@route POST api/posts/mail/:id

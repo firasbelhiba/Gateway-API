@@ -1205,8 +1205,9 @@ router.post("/notify-me", auth, async (req, res) => {
 //@access Private
 router.post("/notify-other-user/:id", auth, async (req, res) => {
   try {
-    const profile = await Profile.findById(req.params.id);
 
+    const user = await User.findById(req.params.id).select("-password");
+    const profile = await Profile.findOne({ user: user._id });
 
     profile.notification.unshift({ message: req.body.message });
 

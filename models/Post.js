@@ -14,6 +14,10 @@ const PostSchema = new Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",
   },
+  profile: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "profile",
+  },
   title: {
     type: String,
     require: true,
