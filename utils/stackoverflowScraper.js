@@ -3,7 +3,7 @@ const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
 const fs = require("fs");
 
-async function scrapeJobStackoverflow(url) {
+module.exports = async function scrapeJobStackoverflow(url) {
   try {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
@@ -59,6 +59,4 @@ async function scrapeJobStackoverflow(url) {
   } catch (e) {
     console.error(e);
   }
-}
-
-scrapeJobStackoverflow("https://stackoverflow.com/jobs");
+};
