@@ -149,7 +149,11 @@ router.put("/like/:id", auth, async (req, res) => {
     ) {
       return res.status(400).json({ message: "Post already liked !" });
     }
-    post.likes.unshift({ user: req.user.id, name: post.name, avatar: post.avatar });
+    post.likes.unshift({
+      user: req.user.id,
+      name: post.name,
+      avatar: post.avatar,
+    });
     await post.save();
     res.json(post.likes);
   } catch (error) {
@@ -492,7 +496,7 @@ router.put("/view/:id", auth, async (req, res) => {
       user: req.user.id,
       name: user.name,
       avatar: user.avatar,
-    }
+    };
 
     post.views.unshift(newView);
 
@@ -642,6 +646,33 @@ router.delete("/unhide/:id", auth, async (req, res) => {
     await profile.save();
 
     res.json(profile.hidden_post);
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
+
+//@author Ghada Khedri
+//@route DELETE api/posts/unsaved/:id
+//@desc Unhide a post
+//@access Private
+router.delete("/unsaved/:id", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    const profile = await Profile.findOne({ user: user._id });
+
+    //Get index
+    const removeIndex = profile.saved_post
+      .map((save) => save.post.toString())
+      .indexOf(req.params.id);
+
+    profile.saved_post.splice(removeIndex, 1);
+    await profile.save();
+
+    res.json(profile.saved_post);
   } catch (error) {
     console.error(error.message);
     if (error.kind === "ObjectId") {
