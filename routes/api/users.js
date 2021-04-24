@@ -8,10 +8,10 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
 const passport = require('passport');
-const cookieSession = require('cookie-session');
 
 
 require('../../utils/google-passeport-setup');
+
 
 const transporter = nodemailer.createTransport(sendgridTransport({
     auth: {

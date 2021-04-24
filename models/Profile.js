@@ -354,11 +354,25 @@ const ProfileSchema = new mongoose.Schema({
       type: String,
     },
   },
-  views: [
+  views_profile: [
     {
       user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",
+      },
+      profile: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "profile",
+      },
+      name: {
+        type: String,
+      },
+      avatar: {
+        type: String,
+      },
+      date: {
+        type: Date,
+        default: Date.now,
       },
     },
   ],
