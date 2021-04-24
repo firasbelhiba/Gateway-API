@@ -14,6 +14,7 @@ module.exports = async function scrapeJobStackoverflow(url) {
     let jobTitles = [];
     let jobImage = [];
     let aboutJob = [];
+    let sortedAboutJob = [];
 
     console.log("1");
 
@@ -39,6 +40,10 @@ module.exports = async function scrapeJobStackoverflow(url) {
 
     console.log("3");
 
+    for (let i = 1; i < aboutJob.length; i += 2) {
+      sortedAboutJob.push(aboutJob[i]);
+    }
+
     fs.writeFileSync(
       "data/stackoverflow/jobTitles.json",
       JSON.stringify(jobTitles)
@@ -49,13 +54,11 @@ module.exports = async function scrapeJobStackoverflow(url) {
     );
     fs.writeFileSync(
       "data/stackoverflow/aboutJob.json",
-      JSON.stringify(aboutJob)
+      JSON.stringify(sortedAboutJob)
     );
     fs.writeFileSync("data/stackoverflow/SOLinks.json", JSON.stringify(links));
 
     console.log("4");
-
-    process.exit();
   } catch (e) {
     console.error(e);
   }

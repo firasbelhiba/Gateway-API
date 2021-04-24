@@ -63,6 +63,7 @@ app.use("/api/posts", require("./routes/api/posts"));
 app.use("/api/q_and_a", require("./routes/api/q_and_a"));
 app.use("/api/jobs", require("./routes/api/jobs"));
 app.use("/api/chat", require("./routes/api/chat"));
+app.use("/api/scrape", require("./routes/api/scrape"));
 
 const PORT = process.env.PORT || 5000;
 
