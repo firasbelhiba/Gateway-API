@@ -8,10 +8,10 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
 const passport = require('passport');
-const cookieSession = require('cookie-session');
 
 
 require('../../utils/google-passeport-setup');
+
 
 const transporter = nodemailer.createTransport(sendgridTransport({
     auth: {
@@ -38,7 +38,7 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 
 router.get('/callback', passport.authenticate('google', { failureRedirect: '/failed' }),
     function (req, res) {
-        newUser = { name: req.user.displayName, pic: req.user.photos[0].value, email: req.user.emails[0].value }
+        newUser = { name: req.user.displayName, avatar: req.user.photos[0].value, email: req.user.emails[0].value }
         res.redirect('http://localhost:3000/login-with-google');
     }
 );

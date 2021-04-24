@@ -149,7 +149,7 @@ router.put("/like/:id", auth, async (req, res) => {
     ) {
       return res.status(400).json({ message: "Post already liked !" });
     }
-    post.likes.unshift({ user: req.user.id });
+    post.likes.unshift({ user: req.user.id, name: post.name, avatar: post.avatar });
     await post.save();
     res.json(post.likes);
   } catch (error) {
@@ -488,11 +488,13 @@ router.put("/view/:id", auth, async (req, res) => {
       return res.status(400).json({ message: "Post already viewed !" });
     }
 
-    post.views.unshift({
+    const newView = {
       user: req.user.id,
       name: user.name,
       avatar: user.avatar,
-    });
+    }
+
+    post.views.unshift(newView);
 
     await post.save();
     res.json(post.views);

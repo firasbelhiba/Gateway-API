@@ -1174,6 +1174,105 @@ router.post("/portfolio", [
 
 
 
+//@author Firas Belhiba
+//@route POST api/profile/notification
+//@desc Notify me 
+//@access Private
+router.post("/notify-me", auth, async (req, res) => {
+  try {
+    const profile = await Profile.findOne({ user: req.user.id });
+
+
+    profile.notification.unshift({ message: req.body.message });
+
+    await profile.save();
+
+    res.json(profile.notification);
+  } catch (error) {
+    console.error(error.message);
+
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+
+    res.status(500).send("Server error");
+  }
+});
+
+//@author Firas Belhiba
+//@route POST api/profile/notify-other-user/:id
+//@desc Notify other user
+//@access Private
+router.post("/notify-other-user/:id", auth, async (req, res) => {
+  try {
+
+    const user = await User.findById(req.params.id).select("-password");
+    const profile = await Profile.findOne({ user: user._id });
+
+    profile.notification.unshift({ message: req.body.message });
+
+    await profile.save();
+
+    res.json(profile.notification);
+  } catch (error) {
+    console.error(error.message);
+
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+
+    res.status(500).send("Server error");
+  }
+});
+
+
+
+//@author Firas Belhiba
+//@route PUT api/profile/view/:id
+//@desc view a profile
+//@access Private
+router.put("/view/:id", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    const profile = await Profile.findOne({ _id: req.params.id });
+
+    const myProfile = await Profile.findOne({ user: req.user.id });
+
+    console.log(profile)
+
+    //Check if the view is already there
+    if (
+      profile.views_profile.filter((view) => view.user.toString() === req.user.id).length >
+      0
+    ) {
+      return res.status(400).json({ message: "Profile already viewed !" });
+    }
+
+    const newView = {
+      user: req.user.id,
+      profile: myProfile._id,
+      name: user.name,
+      avatar: user.avatar,
+    }
+
+
+    profile.views_profile.unshift(newView);
+
+    await profile.save();
+    res.json(profile.views_profile);
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Profile not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
+
+
+
+
 
 
 
