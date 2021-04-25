@@ -47,6 +47,20 @@ const ProfileSchema = new mongoose.Schema({
   cover_image: {
     type: String,
   },
+  suggestions_friends: [
+    {
+      profile: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "profile",
+      },
+      name: {
+        type: String,
+      },
+      avatar: {
+        type: String,
+      },
+    },
+  ],
   follwers: [
     {
       profile: {

@@ -1272,6 +1272,77 @@ router.put("/view/:id", auth, async (req, res) => {
 
 
 
+//@author Firas Belhiba & Ghada Khedri
+//@route GET api/profile/suggestion
+//@desc get suggestions
+//@access Private
+router.get("/suggestion", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    const profile = await (
+      await Profile.findOne({ user: user._id })
+    )
+    const profiles = await Profile.find();
+
+    // If there is no existing profile
+    if (!profile) {
+      return res
+        .status(400)
+        .json({ message: "There is no profile for this user " });
+    }
+
+    const newSuggestions = {};
+
+    for (let i = 0; i < profiles.length; i++) {
+      if (profile.company === profiles[i].company) {
+        newSuggestions.profile = profiles[i]._id;
+        newSuggestions.name = profiles[i].name;
+        newSuggestions.avatar = profiles[i].avatar;
+        profile.suggestions_friends.push(newSuggestions)
+      }
+      if (profile.status === profiles[i].status) {
+        newSuggestions.profile = profiles[i]._id;
+        newSuggestions.name = profiles[i].name;
+        newSuggestions.avatar = profiles[i].avatar;
+        profile.suggestions_friends.push(newSuggestions)
+      }
+
+      for (let j = 0; j < profile.skills.length; j++) {
+        for (k = 0; k < profiles[i].skills.length; k++) {
+          if (profile.skills[j].toLowerCase() === profiles[i].skills[k].toLowerCase()) {
+            newSuggestions.profile = profiles[i]._id;
+            newSuggestions.name = profiles[i].name;
+            newSuggestions.avatar = profiles[i].avatar;
+            profile.suggestions_friends.push(newSuggestions)
+          }
+        }
+      }
+
+    }
+
+    let suggestionList = profile.suggestions_friends
+
+    suggestionList = suggestionList.reduce((acc, current) => {
+      const x = acc.find(item => item.name === current.name);
+      if (!x) {
+        return acc.concat([current]);
+      } else {
+        return acc;
+      }
+    }, []);
+
+    suggestionList = suggestionList.filter(function (obj) {
+      return obj.name !== profile.name;
+    });
+
+    res.json(suggestionList);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server error");
+  }
+});
+
+
 
 
 
