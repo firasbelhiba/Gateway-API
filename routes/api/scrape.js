@@ -23,7 +23,7 @@ router.get("/scrape-stackoverflow", async (req, res) => {
   try {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-    await page.goto("https://stackoverflow.com/jobs?pg=10");
+    await page.goto("https://stackoverflow.com/jobs?pg=8");
     const html = await page.evaluate(() => document.body.innerHTML);
     const $ = await cheerio.load(html);
 

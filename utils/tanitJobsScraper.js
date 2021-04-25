@@ -52,8 +52,6 @@ module.exports = async function scrapeJobTanit(url) {
     );
 
     fs.writeFileSync("data/tanitjobs/TJLinks.json", JSON.stringify(links));
-
-    process.exit();
   } catch (e) {
     console.error(e);
   }
