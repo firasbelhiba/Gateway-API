@@ -182,6 +182,72 @@ router.post('/', [
 
 
 
+//@author Firas Belhiba
+//@Route POST api/users
+// @Description  Register with facebook 
+// @Access Public 
+router.post('/facebook', async (req, res) => {
+
+
+    const { name, email, password, avatar } = req.body;
+
+    try {
+
+        // Check user if already exist 
+        let user = await User.findOne({ email });
+
+        if (user) {
+            res.status(400).json({ errors: [{ message: 'User already exists' }] });
+        }
+
+        // This doesn't create the user it just create an inctance of it (we have to implement the .save();)
+        user = new User({
+            name,
+            email,
+            avatar,
+            password
+        });
+
+        // Password encryption
+        const salt = await bcrypt.genSalt(saltRounds);
+
+        // I added the toString() otherwise it didn't work thanks to : https://github.com/bradtraversy/nodeauthapp/issues/7
+        user.password = await bcrypt.hash(password.toString(), salt);
+
+        user.avatar = avatar;
+
+        await user.save();
+
+        console.log(user.email)
+
+        await transporter.sendMail({
+            to: user.email,
+            from: "gatewayjustcode@gmail.com",
+            subject: "Sign up success",
+            html: "<h1>Welcome to Gateway</h1>"
+        })
+
+        // Get the token
+        const payload = {
+            user: {
+                id: user.id
+            }
+        }
+
+        jwt.sign(payload, config.get('jwtSecret'), { expiresIn: 36000000 }, (err, token) => {
+            if (err) throw err;
+            res.json({ token });
+        })
+
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server error');
+    }
+});
+
+
+
 
 
 
