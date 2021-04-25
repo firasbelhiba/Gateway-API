@@ -1,3 +1,8 @@
+/******************************************************* */
+/**********THIS FILE IS NOT USED  ************************/
+/*****THE CONTENT IS USED DIRECTLY WHERE IT SHOULD TO BE */
+/******************************************************* */
+
 //https://stackoverflow.com/jobs
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
