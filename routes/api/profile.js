@@ -1295,13 +1295,13 @@ router.get("/suggestion", auth, async (req, res) => {
 
     for (let i = 0; i < profiles.length; i++) {
       if (profile.company === profiles[i].company) {
-        newSuggestions.profile = profiles[i]._id;
+        newSuggestions.profile = profiles[i].user;
         newSuggestions.name = profiles[i].name;
         newSuggestions.avatar = profiles[i].avatar;
         profile.suggestions_friends.push(newSuggestions)
       }
       if (profile.status === profiles[i].status) {
-        newSuggestions.profile = profiles[i]._id;
+        newSuggestions.profile = profiles[i].user;
         newSuggestions.name = profiles[i].name;
         newSuggestions.avatar = profiles[i].avatar;
         profile.suggestions_friends.push(newSuggestions)
@@ -1310,7 +1310,7 @@ router.get("/suggestion", auth, async (req, res) => {
       for (let j = 0; j < profile.skills.length; j++) {
         for (k = 0; k < profiles[i].skills.length; k++) {
           if (profile.skills[j].toLowerCase() === profiles[i].skills[k].toLowerCase()) {
-            newSuggestions.profile = profiles[i]._id;
+            newSuggestions.profile = profiles[i].user;
             newSuggestions.name = profiles[i].name;
             newSuggestions.avatar = profiles[i].avatar;
             profile.suggestions_friends.push(newSuggestions)
@@ -1334,6 +1334,9 @@ router.get("/suggestion", auth, async (req, res) => {
     suggestionList = suggestionList.filter(function (obj) {
       return obj.name !== profile.name;
     });
+
+
+    //await profile.save();
 
     res.json(suggestionList);
   } catch (error) {

@@ -8,6 +8,16 @@ const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const sendgridTransport = require('nodemailer-sendgrid-transport');
 const passport = require('passport');
+const { LinkedInProfileScraper } = require('linkedin-profile-scraper');
+const fs = require('fs');
+
+const linkedinDataJSON = fs.readFileSync("././data/dataLinkedinProfile.json");
+
+let linkedinData = JSON.parse(linkedinDataJSON);
+
+
+
+
 
 
 require('../../utils/google-passeport-setup');
@@ -246,6 +256,91 @@ router.post('/facebook', async (req, res) => {
     }
 });
 
+//'https://www.linkedin.com/in/ghada-khedri-540351111/'
+//AQEDATPI9UsAoS3aAAABd_3dN8gAAAF5JPeMVU4AJCTtlcougs-7X_qGsf2NZx7H1iL5OVVAtJ0z2mxBOx2GqCAs_Ec1Fg_KtSQ_lmug1Qm4_2ldbBhX0WRbAQG83xZaL9BE_YXCEiCt9VF6DmaXcuWy
+//@author Firas Belhiba
+//@Route POST api/users/linkedin
+// @Description  Register with linkedin 
+// @Access Public
+router.post('/linkedin', async (req, res) => {
+
+    const { email, password, link, cookie } = req.body;
+
+    try {
+        // console.log('scrapper is executing');
+
+        // const scraper = new LinkedInProfileScraper({
+        //     sessionCookieValue: cookie,
+        //     keepAlive: false,
+        //     timeout: 0
+        // });
+
+        // console.log('Setup is exucting');
+
+
+        // await scraper.setup();
+
+
+        // console.log('Result is exucting');
+
+        // const result = await scraper.run(link, {
+        //     waitUntil: 'load',
+        //     timeout: 0
+        // });
+        // console.log(result)
+
+        // let data = JSON.stringify(result)
+        // fs.writeFileSync('data/dataLinkedinProfile.json', data);
+
+        // Check user if already exist 
+        let user = await User.findOne({ email });
+
+        if (user) {
+            res.status(400).json({ errors: [{ message: 'User already exists' }] });
+        }
+
+        // This doesn't create the user it just create an inctance of it (we have to implement the .save();)
+        user = new User();
+        const profileFields = {};
+
+        // Password encryption
+        const salt = await bcrypt.genSalt(saltRounds);
+
+        // I added the toString() otherwise it didn't work thanks to : https://github.com/bradtraversy/nodeauthapp/issues/7
+        user.password = await bcrypt.hash(password.toString(), salt);
+
+        user.email = email;
+
+        user.name = linkedinData.userProfile.fullName;
+
+        user.avatar = linkedinData.userProfile.photo;
+
+        await user.save();
+
+        await transporter.sendMail({
+            to: user.email,
+            from: "gatewayjustcode@gmail.com",
+            subject: "Sign up success",
+            html: "<h1>Welcome to Gateway</h1>"
+        })
+
+        // Get the token
+        const payload = {
+            user: {
+                id: user.id
+            }
+        }
+
+        jwt.sign(payload, config.get('jwtSecret'), { expiresIn: 36000000 }, (err, token) => {
+            if (err) throw err;
+            res.json({ token });
+        })
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server error');
+    }
+})
 
 
 
