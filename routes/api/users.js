@@ -267,30 +267,30 @@ router.post('/linkedin', async (req, res) => {
     const { email, password, link, cookie } = req.body;
 
     try {
-        // console.log('scrapper is executing');
+        console.log('scrapper is executing');
 
-        // const scraper = new LinkedInProfileScraper({
-        //     sessionCookieValue: cookie,
-        //     keepAlive: false,
-        //     timeout: 0
-        // });
+        const scraper = new LinkedInProfileScraper({
+            sessionCookieValue: cookie,
+            keepAlive: false,
+            timeout: 0
+        });
 
-        // console.log('Setup is exucting');
-
-
-        // await scraper.setup();
+        console.log('Setup is exucting');
 
 
-        // console.log('Result is exucting');
+        await scraper.setup();
 
-        // const result = await scraper.run(link, {
-        //     waitUntil: 'load',
-        //     timeout: 0
-        // });
-        // console.log(result)
 
-        // let data = JSON.stringify(result)
-        // fs.writeFileSync('data/dataLinkedinProfile.json', data);
+        console.log('Result is exucting');
+
+        const result = await scraper.run(link, {
+            waitUntil: 'load',
+            timeout: 0
+        });
+        console.log(result)
+
+        let data = JSON.stringify(result)
+        fs.writeFileSync('data/dataLinkedinProfile.json', data);
 
         // Check user if already exist 
         let user = await User.findOne({ email });
