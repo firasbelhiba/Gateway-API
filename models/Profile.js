@@ -402,7 +402,7 @@ const ProfileSchema = new mongoose.Schema({
       },
       image: {
         type: [String],
-      }
+      },
     },
   ],
   notification: [
