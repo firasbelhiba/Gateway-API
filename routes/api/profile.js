@@ -4,9 +4,6 @@ const config = require("config");
 const router = express.Router();
 const { check, validationResult } = require("express-validator/check");
 
-
-
-
 const auth = require("../../middleware/auth");
 const Profile = require("../../models/Profile");
 const User = require("../../models/User");
@@ -760,10 +757,11 @@ router.get("/github/:username", async (req, res) => {
   try {
     // This is only to show  repositories , if you want to show more or less just change the per_page parameters in the uri
     const options = {
-      uri: `https://api.github.com/users/${req.params.username
-        }/repos?per_page=5&sort=created:asc&client_id=${config.get(
-          "githubClientId"
-        )}&client_secret=${config.get("githubSecret")}`,
+      uri: `https://api.github.com/users/${
+        req.params.username
+      }/repos?per_page=5&sort=created:asc&client_id=${config.get(
+        "githubClientId"
+      )}&client_secret=${config.get("githubSecret")}`,
       method: "GET",
       headers: { "user-agent": "node.js" },
     };
@@ -803,10 +801,13 @@ router.put("/follow/:id", auth, async (req, res) => {
 
     //Check if the profile is already followed
     if (
-      profile.following.filter((follow) => follow.profile.toString() === req.params.id).length >
-      0
+      profile.following.filter(
+        (follow) => follow.profile.toString() === req.params.id
+      ).length > 0
     ) {
-      return res.status(400).json({ message: "You already followed this profile!" });
+      return res
+        .status(400)
+        .json({ message: "You already followed this profile!" });
     }
 
     newFollowing = {};
@@ -818,10 +819,9 @@ router.put("/follow/:id", auth, async (req, res) => {
 
     newFollower = {};
 
-    newFollower.profile = profile.id
-    newFollower.name = profile.name
-    newFollower.avatar = profile.avatar
-
+    newFollower.profile = profile.id;
+    newFollower.name = profile.name;
+    newFollower.avatar = profile.avatar;
 
     profile.following.unshift(newFollowing);
 
@@ -830,11 +830,8 @@ router.put("/follow/:id", auth, async (req, res) => {
     await profile.save();
     await followedProfile.save();
 
-
     res.json(profile.following);
-
   } catch (error) {
-
     console.error(error.message);
 
     if (error.kind === "ObjectId") {
@@ -844,7 +841,6 @@ router.put("/follow/:id", auth, async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
 
 //@author Firas Belhiba
 //@route PUT api/profile/unfollow/:id
@@ -856,23 +852,26 @@ router.put("/unfollow/:id", auth, async (req, res) => {
 
     const unfollowedProfile = await Profile.findById(req.params.id);
 
-
     if (!profile) {
       return res.status(400).json({ message: "Profile not found" });
     }
 
     if (req.params.id === profile.id) {
-      return res.status(400).json({ message: "You can't unfollow yourself !! " });
+      return res
+        .status(400)
+        .json({ message: "You can't unfollow yourself !! " });
     }
 
     //Check if the profile is already followed
     if (
-      profile.following.filter((follow) => follow.profile.toString() === req.params.id).length
-      === 0
+      profile.following.filter(
+        (follow) => follow.profile.toString() === req.params.id
+      ).length === 0
     ) {
-      return res.status(400).json({ message: "You already unfollowed this profile!" });
+      return res
+        .status(400)
+        .json({ message: "You already unfollowed this profile!" });
     }
-
 
     //Remove Index
     const removeIndexFollowing = profile.following
@@ -883,11 +882,9 @@ router.put("/unfollow/:id", auth, async (req, res) => {
       .map((follow) => follow.profile.toString())
       .indexOf(profile.id);
 
-
     profile.following.splice(removeIndexFollowing, 1);
 
     unfollowedProfile.follwers.splice(removeIndexFollowers, 1);
-
 
     await profile.save();
     await unfollowedProfile.save();
@@ -1057,8 +1054,6 @@ router.post("/upload", [upload.array("image"), auth], async (req, res) => {
       { new: true }
     );
 
-
-
     res.status(200).json({
       message: "Images Uploaded Succefully",
       data: urls,
@@ -1115,73 +1110,66 @@ router.post("/cover", [upload.array("image"), auth], async (req, res) => {
 //@route POST api/profile/portfolio
 //@desc add portfolio
 //@access private
-router.post("/portfolio", [
-  auth,
+router.post(
+  "/portfolio",
   [
-    check("title", "Title is required ").not().isEmpty(),
-    check("description", "Description is required ").not().isEmpty(),
+    auth,
+    [
+      check("title", "Title is required ").not().isEmpty(),
+      check("description", "Description is required ").not().isEmpty(),
+    ],
+    upload.array("image"),
   ],
-  upload.array("image"),
-], async (req, res) => {
-
-  const errors = validationResult(req);
-  if (!errors.isEmpty) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  try {
-
-    const uploader = async (path) => await cloudinary.uploads(path, "Images");
-
-    const urls = [];
-
-    const files = req.files;
-
-    for (const file of files) {
-      const { path } = file;
-      const newPath = await uploader(path);
-      urls.push(newPath);
-      fs.unlinkSync(path);
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    const {
-      title,
-      description,
-    } = req.body;
+    try {
+      const uploader = async (path) => await cloudinary.uploads(path, "Images");
 
-    const newPortfolio = {
-      title: title,
-      description: description,
-      image: urls[0].url
-    };
+      const urls = [];
 
+      const files = req.files;
 
-    const profile = await Profile.findOne({ user: req.user.id });
+      for (const file of files) {
+        const { path } = file;
+        const newPath = await uploader(path);
+        urls.push(newPath);
+        fs.unlinkSync(path);
+      }
 
-    // unshift it push in the begging rather than the end
-    profile.portfolio.unshift(newPortfolio);
+      const { title, description } = req.body;
 
-    await profile.save();
+      const newPortfolio = {
+        title: title,
+        description: description,
+        image: urls[0].url,
+      };
 
-    res.json(profile);
+      const profile = await Profile.findOne({ user: req.user.id });
 
+      // unshift it push in the begging rather than the end
+      profile.portfolio.unshift(newPortfolio);
 
-  } catch (error) {
-    console.error(error.message);
-    res.status(500).send("Server error");
+      await profile.save();
+
+      res.json(profile);
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Server error");
+    }
   }
-});
-
-
+);
 
 //@author Firas Belhiba
 //@route POST api/profile/notification
-//@desc Notify me 
+//@desc Notify me
 //@access Private
 router.post("/notify-me", auth, async (req, res) => {
   try {
     const profile = await Profile.findOne({ user: req.user.id });
-
 
     profile.notification.unshift({ message: req.body.message });
 
@@ -1205,7 +1193,6 @@ router.post("/notify-me", auth, async (req, res) => {
 //@access Private
 router.post("/notify-other-user/:id", auth, async (req, res) => {
   try {
-
     const user = await User.findById(req.params.id).select("-password");
     const profile = await Profile.findOne({ user: user._id });
 
@@ -1225,8 +1212,6 @@ router.post("/notify-other-user/:id", auth, async (req, res) => {
   }
 });
 
-
-
 //@author Firas Belhiba
 //@route PUT api/profile/view/:id
 //@desc view a profile
@@ -1239,12 +1224,13 @@ router.put("/view/:id", auth, async (req, res) => {
 
     const myProfile = await Profile.findOne({ user: req.user.id });
 
-    console.log(profile)
+    console.log(profile);
 
     //Check if the view is already there
     if (
-      profile.views_profile.filter((view) => view.user.toString() === req.user.id).length >
-      0
+      profile.views_profile.filter(
+        (view) => view.user.toString() === req.user.id
+      ).length > 0
     ) {
       return res.status(400).json({ message: "Profile already viewed !" });
     }
@@ -1254,8 +1240,7 @@ router.put("/view/:id", auth, async (req, res) => {
       profile: myProfile._id,
       name: user.name,
       avatar: user.avatar,
-    }
-
+    };
 
     profile.views_profile.unshift(newView);
 
@@ -1269,11 +1254,5 @@ router.put("/view/:id", auth, async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
-
-
-
-
-
 
 module.exports = router;
