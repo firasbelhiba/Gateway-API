@@ -11,7 +11,7 @@ const cloudinary = require("../../utils/cloudinary");
 const nodemailer = require("nodemailer");
 const sendgridTransport = require("nodemailer-sendgrid-transport");
 const config = require("config");
-
+const tc = require("text-censor");
 const transporter = nodemailer.createTransport(
   sendgridTransport({
     auth: {
@@ -56,8 +56,8 @@ router.post(
 
       const newPost = new Post({
         user: req.user.id,
-        title: req.body.title,
-        text: req.body.text,
+        title: tc.filter(req.body.title),
+        text: tc.filter(req.body.text),
         image: urls,
         avatar: user.avatar,
         name: user.name,
@@ -216,7 +216,7 @@ router.post(
       const user = await User.findById(req.user.id).select("-password");
       const newComment = {
         user: req.user.id,
-        text: req.body.text,
+        text: tc.filter(req.body.text),
         name: user.name,
         avatar: user.avatar,
       };
