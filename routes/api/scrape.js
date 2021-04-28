@@ -117,6 +117,7 @@ let linksTJ = [];
 //@access Private
 router.get("/scrape-tanitjob", async (req, res) => {
   try {
+    console.log('tanit')
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
     await page.goto("https://www.tanitjobs.com/");
@@ -166,7 +167,7 @@ router.get("/scrape-tanitjob", async (req, res) => {
 
     fs.writeFileSync("data/tanitjobs/TJLinks.json", JSON.stringify(links));
 
-    jobTitlesTJ = JSON.parse("Scraped succefully ! ");
+    jobTitlesTJ = JSON.parse(jobTitleFromJson);
     locationAndCompanyTJ = JSON.parse(locationAndCompanyFromJson);
 
     res.json(locationAndCompanyTJ);
@@ -202,11 +203,46 @@ router.get("/get-scraped-data-tanitjob", async (req, res) => {
         location: scrapeLocation[i],
       });
     }
-    res.json(scrapeList);
+    res.json(jobTitlesTJ);
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server error");
   }
 });
+
+
+
+//@author Ghada Khedri
+//@route GET api/scrape/get-scraped-data-tanitjob
+//@desc scrape jobs
+//@access Private
+// router.get("/get-scraped-data-tanitjob", async (req, res) => {
+//   try {
+//     let scrapeList = [];
+//     let scrapeLocation = [];
+//     let scrapeCompany = [];
+
+//     for (let i = 0; i < locationAndCompanyTJ.length; i += 2) {
+//       scrapeCompany.push(locationAndCompanyTJ[i]);
+//     }
+
+//     for (let i = 1; i < locationAndCompanyTJ.length; i += 2) {
+//       scrapeLocation.push(locationAndCompanyTJ[i]);
+//     }
+
+//     for (let i = 0; i < 5; i++) {
+//       scrapeList.push({
+//         title: jobTitlesTJ[i],
+//         link: linksTJ[i],
+//         company: scrapeCompany[i],
+//         location: scrapeLocation[i],
+//       });
+//     }
+//     res.json(jobTitlesTJ);
+//   } catch (error) {
+//     console.error(error.message);
+//     res.status(500).send("Server error");
+//   }
+// });
 
 module.exports = router;
