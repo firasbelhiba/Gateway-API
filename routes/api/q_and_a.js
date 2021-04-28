@@ -16,6 +16,15 @@ router.get('/', (req, res) => {
     }
 );
 
+router.get('/followed/:idU', (req, res) => {
+        Question.find().then(Questions =>
+            console.log(Questions.following.includes(req.params.idU))
+        )
+            .catch(err => res.status(400).json('error: ' + err));
+    }
+);
+
+
 //FindQuestionByID
 router.get('/:id', (req, res) => {
         Question.findById(req.params.id).then(Question => res.json(Question))
@@ -588,5 +597,38 @@ router.get('/searchQuestions/:text', (req, res) => {
         }).catch(err => res.status(400).json('error: ' + err));
     }
 );
+
+router.post('/:idQ/followQuestion/:idU', (req, res) => {
+        Question.findById(req.params.idQ).then(Question => {
+            const follow = {
+                user: req.params.idU,
+            }
+            Question.following.push(follow);
+
+            Question.save().then(() => {
+                console.log('followed');
+                Question.find().then(Questions => res.json(Questions))
+            }).catch(err => {
+                res.status(400).json('error: ' + err);
+            })
+        }).catch(err => res.status(400).json('error: ' + err));
+    }
+);
+
+router.post('/:idQ/unFollowQuestion/:idU', (req, res) => {
+    Question.findById(req.params.idQ).then(Question => {
+
+        const followIndex = Question.following
+            .map((follow) => follow.user.toString())
+            .indexOf(req.params.idA);
+        Question.following.splice(followIndex, 1);
+        Question.save().then(() => {
+            console.log('follow canceled');
+            Question.find().then(Questions => res.json(Questions))
+        }).catch(err => {
+            res.status(400).json('error: ' + err);
+        })
+    }).catch(err => res.status(400).json('error: ' + err));
+});
 
 module.exports = router;
