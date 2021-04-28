@@ -3,7 +3,7 @@ const request = require("request");
 const config = require("config");
 const router = express.Router();
 const { check, validationResult } = require("express-validator/check");
-const { LinkedInProfileScraper } = require('linkedin-profile-scraper');
+const { LinkedInProfileScraper } = require("linkedin-profile-scraper");
 
 const auth = require("../../middleware/auth");
 const Profile = require("../../models/Profile");
@@ -13,171 +13,149 @@ const cloudinary = require("../../utils/cloudinary");
 const upload = require("../../middleware/multer");
 const fs = require("fs");
 
-
 const linkedinDataJSON = fs.readFileSync("././data/dataLinkedinProfile.json");
 
 let linkedinData = JSON.parse(linkedinDataJSON);
-
-
 
 //@author Firas Belhiba
 //@route POST api/profile/linkedin
 //@desc Create profile with linkedin
 //@access Private
-router.post(
-  "/linkedin",
-  [
-    auth,
-  ],
-  async (req, res) => {
+router.post("/linkedin", [auth], async (req, res) => {
+  const user = await User.findById(req.user.id).select("-password");
 
-    const user = await User.findById(req.user.id).select("-password");
+  const { link, cookie } = req.body;
 
-    const {
-      link,
-      cookie,
-    } = req.body;
+  // Build profile object
+  const profileFields = {};
+  const newExperience = {};
+  const newEducation = {};
+  const skills = [];
 
-    // Build profile object
-    const profileFields = {};
-    const newExperience = {};
-    const newEducation = {};
-    const skills = []
+  profileFields.user = req.user.id;
 
-    profileFields.user = req.user.id;
-
-    if (linkedinData.userProfile.description === null) {
-      profileFields.bio = "No bio specified"
-    } else {
-      profileFields.bio = linkedinData.userProfile.description;
-    }
-
-    if (linkedinData.userProfile.fullName === null) {
-      profileFields.name = "No name specified"
-    } else {
-      profileFields.name = linkedinData.userProfile.fullName;
-    }
-
-    profileFields.avatar = linkedinData.userProfile.photo;
-
-    if (linkedinData.userProfile.location.city === null) {
-      profileFields.location = "No location specified"
-    } else {
-      profileFields.location = linkedinData.userProfile.location.city;
-    }
-
-    if (linkedinData.userProfile.title === null) {
-      profileFields.status = "No status specified"
-    } else {
-      profileFields.status = linkedinData.userProfile.title;
-    }
-
-
-    for (let i = 0; i < linkedinData.skills.length; i++) {
-      skills.push(linkedinData.skills[i].skillName)
-      profileFields.skills = skills;
-    }
-
-
-
-    try {
-
-      console.log('scrapper is executing');
-
-      const scraper = new LinkedInProfileScraper({
-        sessionCookieValue: cookie,
-        keepAlive: false,
-        timeout: 0
-      });
-
-      console.log('Setup is exucting');
-
-
-      await scraper.setup();
-
-
-      console.log('Result is exucting');
-
-      const result = await scraper.run(link, {
-        waitUntil: 'load',
-        timeout: 0
-      });
-      console.log(result)
-
-      let data = JSON.stringify(result)
-      fs.writeFileSync('data/dataLinkedinProfile.json', data);
-
-      let profile = await Profile.findOne({ user: req.user.id });
-
-      profile = new Profile(profileFields);
-
-      for (let i = 0; i < linkedinData.experiences.length; i++) {
-        if (linkedinData.experiences[i].title === null) {
-          newExperience.title = "No title specified"
-        } else {
-          newExperience.title = linkedinData.experiences[i].title;
-        }
-
-        if (linkedinData.experiences[i].company === null) {
-          newExperience.company = "No company specified"
-        } else {
-          newExperience.company = linkedinData.experiences[i].company;
-        }
-
-        if (linkedinData.experiences[i].location.country === null) {
-          newExperience.location = "No location specified"
-        } else {
-          newExperience.location = linkedinData.experiences[i].location.country;
-        }
-
-        newExperience.from = linkedinData.experiences[i].startDate;
-        newExperience.to = linkedinData.experiences[i].endDate;
-        newExperience.current = linkedinData.experiences[i].endDateIsPresent;
-
-        if (linkedinData.experiences[i].description === null) {
-          newExperience.description = "No description specified"
-        } else {
-
-          newExperience.description = linkedinData.experiences[i].description;
-        }
-        profile.experience.unshift(newExperience)
-      }
-
-      for (let i = 0; i < linkedinData.education.length; i++) {
-        if (linkedinData.education[i].fieldOfStudy === null) {
-          newEducation.fieldofstudy = "No field study specified"
-        } else {
-          newEducation.fieldofstudy = linkedinData.education[i].fieldOfStudy;
-        }
-
-        if (linkedinData.education[i].schoolName === null) {
-          newEducation.school = "No school specified"
-        } else {
-          newEducation.school = linkedinData.education[i].schoolName;
-        }
-
-
-        if (linkedinData.education[i].degreeName === null) {
-          newEducation.degree = "No degree specified"
-        } else {
-          newEducation.degree = linkedinData.education[i].degreeName;
-        }
-
-        newEducation.from = linkedinData.education[i].startDate;
-        newEducation.to = linkedinData.education[i].endDate;
-        profile.education.unshift(newEducation)
-      }
-
-
-      await profile.save();
-
-      res.json(profile);
-    } catch (error) {
-      console.error(error.message);
-      res.status(500).send("Server error");
-    }
+  if (linkedinData.userProfile.description === null) {
+    profileFields.bio = "No bio specified";
+  } else {
+    profileFields.bio = linkedinData.userProfile.description;
   }
-);
+
+  if (linkedinData.userProfile.fullName === null) {
+    profileFields.name = "No name specified";
+  } else {
+    profileFields.name = linkedinData.userProfile.fullName;
+  }
+
+  profileFields.avatar = linkedinData.userProfile.photo;
+
+  if (linkedinData.userProfile.location.city === null) {
+    profileFields.location = "No location specified";
+  } else {
+    profileFields.location = linkedinData.userProfile.location.city;
+  }
+
+  if (linkedinData.userProfile.title === null) {
+    profileFields.status = "No status specified";
+  } else {
+    profileFields.status = linkedinData.userProfile.title;
+  }
+
+  for (let i = 0; i < linkedinData.skills.length; i++) {
+    skills.push(linkedinData.skills[i].skillName);
+    profileFields.skills = skills;
+  }
+
+  try {
+    console.log("scrapper is executing");
+
+    const scraper = new LinkedInProfileScraper({
+      sessionCookieValue: cookie,
+      keepAlive: false,
+      timeout: 0,
+    });
+
+    console.log("Setup is exucting");
+
+    await scraper.setup();
+
+    console.log("Result is exucting");
+
+    const result = await scraper.run(link, {
+      waitUntil: "load",
+      timeout: 0,
+    });
+    console.log(result);
+
+    let data = JSON.stringify(result);
+    fs.writeFileSync("data/dataLinkedinProfile.json", data);
+
+    let profile = await Profile.findOne({ user: req.user.id });
+
+    profile = new Profile(profileFields);
+
+    for (let i = 0; i < linkedinData.experiences.length; i++) {
+      if (linkedinData.experiences[i].title === null) {
+        newExperience.title = "No title specified";
+      } else {
+        newExperience.title = linkedinData.experiences[i].title;
+      }
+
+      if (linkedinData.experiences[i].company === null) {
+        newExperience.company = "No company specified";
+      } else {
+        newExperience.company = linkedinData.experiences[i].company;
+      }
+
+      // if (linkedinData.experiences[i].location.country === null) {
+      //   newExperience.location = "No location specified"
+      // } else {
+      //   newExperience.location = linkedinData.experiences[i].location.country;
+      // }
+
+      newExperience.from = linkedinData.experiences[i].startDate;
+      newExperience.to = linkedinData.experiences[i].endDate;
+      newExperience.current = linkedinData.experiences[i].endDateIsPresent;
+
+      if (linkedinData.experiences[i].description === null) {
+        newExperience.description = "No description specified";
+      } else {
+        newExperience.description = linkedinData.experiences[i].description;
+      }
+      profile.experience.unshift(newExperience);
+    }
+
+    for (let i = 0; i < linkedinData.education.length; i++) {
+      if (linkedinData.education[i].fieldOfStudy === null) {
+        newEducation.fieldofstudy = "No field study specified";
+      } else {
+        newEducation.fieldofstudy = linkedinData.education[i].fieldOfStudy;
+      }
+
+      if (linkedinData.education[i].schoolName === null) {
+        newEducation.school = "No school specified";
+      } else {
+        newEducation.school = linkedinData.education[i].schoolName;
+      }
+
+      if (linkedinData.education[i].degreeName === null) {
+        newEducation.degree = "No degree specified";
+      } else {
+        newEducation.degree = linkedinData.education[i].degreeName;
+      }
+
+      newEducation.from = linkedinData.education[i].startDate;
+      newEducation.to = linkedinData.education[i].endDate;
+      profile.education.unshift(newEducation);
+    }
+
+    await profile.save();
+
+    res.json(profile);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server error");
+  }
+});
 
 //@author Firas Belhiba
 //@route GET api/profile/me
@@ -924,10 +902,11 @@ router.get("/github/:username", async (req, res) => {
   try {
     // This is only to show  repositories , if you want to show more or less just change the per_page parameters in the uri
     const options = {
-      uri: `https://api.github.com/users/${req.params.username
-        }/repos?per_page=5&sort=created:asc&client_id=${config.get(
-          "githubClientId"
-        )}&client_secret=${config.get("githubSecret")}`,
+      uri: `https://api.github.com/users/${
+        req.params.username
+      }/repos?per_page=5&sort=created:asc&client_id=${config.get(
+        "githubClientId"
+      )}&client_secret=${config.get("githubSecret")}`,
       method: "GET",
       headers: { "user-agent": "node.js" },
     };
@@ -1421,8 +1400,6 @@ router.put("/view/:id", auth, async (req, res) => {
   }
 });
 
-
-
 //@author Firas Belhiba & Ghada Khedri
 //@route GET api/profile/suggestion
 //@desc get suggestions
@@ -1430,9 +1407,7 @@ router.put("/view/:id", auth, async (req, res) => {
 router.get("/suggestion", auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
-    const profile = await (
-      await Profile.findOne({ user: user._id })
-    )
+    const profile = await await Profile.findOne({ user: user._id });
     const profiles = await Profile.find();
 
     // If there is no existing profile
@@ -1449,32 +1424,34 @@ router.get("/suggestion", auth, async (req, res) => {
         newSuggestions.profile = profiles[i].user;
         newSuggestions.name = profiles[i].name;
         newSuggestions.avatar = profiles[i].avatar;
-        profile.suggestions_friends.push(newSuggestions)
+        profile.suggestions_friends.push(newSuggestions);
       }
       if (profile.status === profiles[i].status) {
         newSuggestions.profile = profiles[i].user;
         newSuggestions.name = profiles[i].name;
         newSuggestions.avatar = profiles[i].avatar;
-        profile.suggestions_friends.push(newSuggestions)
+        profile.suggestions_friends.push(newSuggestions);
       }
 
       for (let j = 0; j < profile.skills.length; j++) {
         for (k = 0; k < profiles[i].skills.length; k++) {
-          if (profile.skills[j].toLowerCase() === profiles[i].skills[k].toLowerCase()) {
+          if (
+            profile.skills[j].toLowerCase() ===
+            profiles[i].skills[k].toLowerCase()
+          ) {
             newSuggestions.profile = profiles[i].user;
             newSuggestions.name = profiles[i].name;
             newSuggestions.avatar = profiles[i].avatar;
-            profile.suggestions_friends.push(newSuggestions)
+            profile.suggestions_friends.push(newSuggestions);
           }
         }
       }
-
     }
 
-    let suggestionList = profile.suggestions_friends
+    let suggestionList = profile.suggestions_friends;
 
     suggestionList = suggestionList.reduce((acc, current) => {
-      const x = acc.find(item => item.name === current.name);
+      const x = acc.find((item) => item.name === current.name);
       if (!x) {
         return acc.concat([current]);
       } else {
@@ -1486,7 +1463,6 @@ router.get("/suggestion", auth, async (req, res) => {
       return obj.name !== profile.name;
     });
 
-
     //await profile.save();
 
     res.json(suggestionList);
@@ -1496,9 +1472,64 @@ router.get("/suggestion", auth, async (req, res) => {
   }
 });
 
+//@author Firas Belhiba
+//@route POST api/profile/review/:id
+//@desc add a review
+//@access Private
+router.post("/review/:id", auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    const myProfile = await Profile.findOne({ user: user._id });
 
+    const profile = await Profile.findOne({ _id: req.params.id });
 
+    if (!profile) {
+      return res.status(404).json({ message: "Profile not Found " });
+    }
 
+    const { text, rate } = req.body;
 
+    const newReview = {};
+
+    newReview.profile = myProfile._id;
+    newReview.text = text;
+    newReview.rate = rate;
+
+    profile.reviews.unshift(newReview);
+
+    await profile.save();
+
+    res.json(profile.reports);
+  } catch (error) {
+    console.error(error.message);
+
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Profile not Found " });
+    }
+
+    res.status(500).send("Server error");
+  }
+});
+
+//@author Ghada Khedri
+//@route GET api/profile/most-viewed-people
+//@desc get most viewed people
+//@access Private
+router.get("/most-viewed-people", auth, async (req, res) => {
+  try {
+    const profiles = await Profile.find();
+    let sortByView = profiles.sort((a, b) => {
+      return b.views_profile.length - a.views_profile.length;
+    });
+    let topList = [];
+    for (let i = 0; i < 5; i++) {
+      topList.unshift(sortByView[i]);
+    }
+    res.json(topList);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server error");
+  }
+});
 
 module.exports = router;

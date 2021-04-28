@@ -24,6 +24,14 @@ const QuestionSchema = new Schema({
             require: true,
         },
     ],
+    following: [
+        {
+            user: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "user",
+            },
+        },
+    ],
     upVotes: [
         {
             user: {
@@ -40,14 +48,10 @@ const QuestionSchema = new Schema({
             },
         },
     ],
-    views: [
-        {
-            user: {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "user",
-            },
-        },
-    ],
+    views: {
+        type: Number,
+        default: 0,
+    },
     solved: {
         type: Boolean,
         default: false,
@@ -80,6 +84,22 @@ const QuestionSchema = new Schema({
                 type: Boolean,
                 default: false,
             },
+            upVotes: [
+                {
+                    user: {
+                        type: mongoose.Schema.Types.ObjectId,
+                        ref: "user",
+                    },
+                },
+            ],
+            downVotes: [
+                {
+                    user: {
+                        type: mongoose.Schema.Types.ObjectId,
+                        ref: "user",
+                    },
+                },
+            ],
             reports: [
                 {
                     user: {
@@ -104,6 +124,22 @@ const QuestionSchema = new Schema({
                         type: Date,
                         default: Date.now,
                     },
+                    upVotes: [
+                        {
+                            user: {
+                                type: mongoose.Schema.Types.ObjectId,
+                                ref: "user",
+                            },
+                        },
+                    ],
+                    downVotes: [
+                        {
+                            user: {
+                                type: mongoose.Schema.Types.ObjectId,
+                                ref: "user",
+                            },
+                        },
+                    ],
                 },
             ],
         },
