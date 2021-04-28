@@ -1522,6 +1522,8 @@ router.post("/review/:id", auth, async (req, res) => {
     const newReview = {};
 
     newReview.profile = myProfile._id;
+    newReview.name = myProfile.name;
+    newReview.avatar = myProfile.avatar;
     newReview.text = text;
     newReview.rate = rate;
 
@@ -1529,7 +1531,7 @@ router.post("/review/:id", auth, async (req, res) => {
 
     await profile.save();
 
-    res.json(profile.reports);
+    res.json(profile.reviews);
 
   } catch (error) {
     console.error(error.message);

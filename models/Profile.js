@@ -430,6 +430,12 @@ const ProfileSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "profile",
       },
+      name: {
+        type: String,
+      },
+      avatar: {
+        type: String,
+      },
       text: {
         type: String,
       },
