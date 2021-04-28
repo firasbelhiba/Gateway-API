@@ -1,1 +1,249 @@
-{"userProfile":{"fullName":"Karim Maaoui","title":"Java Software Developer at Sofrecom Tunisie","location":{"city":null,"province":"Ariana Governorate","country":"Tunisia"},"photo":"https://media-exp1.licdn.com/dms/image/C4E35AQGt2iP8O87Ndg/profile-framedphoto-shrink_200_200/0/1610467079720?e=1619661600&v=beta&t=Zr97R8R7dYdzjimJnLNhsgfWztfU2uj13taZ6rNKJrk","description":null,"url":"https://www.linkedin.com/in/maaoui-karim/"},"experiences":[{"title":"Java Software Developer","company":"Sofrecom Tunisie","employmentType":"Full-time","location":{"city":null,"province":null,"country":"Tunisia"},"startDate":"2021-02-01T00:00:00+01:00","endDate":"2021-04-28T03:44:27+02:00","endDateIsPresent":true,"description":null,"durationInDays":87},{"title":"Full-stack Developer","company":"Fulfillment Bridge","employmentType":"Full-time","location":{"city":null,"province":"Gouvernorat de Tunis","country":"Tunisia"},"startDate":"2019-07-01T00:00:00+02:00","endDate":"2021-02-01T00:00:00+01:00","endDateIsPresent":false,"description":null,"durationInDays":582},{"title":"Full-stack Developer","company":"Gfi Tunisie","employmentType":"Full-time","location":{"city":null,"province":"Tunisie","country":null},"startDate":"2018-08-01T00:00:00+02:00","endDate":"2019-07-01T00:00:00+02:00","endDateIsPresent":false,"description":null,"durationInDays":335},{"title":"Internship Trainee","company":"Helios IT2","employmentType":null,"location":null,"startDate":"2017-02-01T00:00:00+01:00","endDate":"2017-06-01T00:00:00+02:00","endDateIsPresent":false,"description":null,"durationInDays":121}],"education":[{"schoolName":"Université Sesame","degreeName":"Engineer's degree","fieldOfStudy":"Computer Software Engineering","startDate":"2018-01-01T00:00:00+01:00","endDate":"2020-01-01T00:00:00+01:00","durationInDays":731},{"schoolName":"University of Tunis El Manar","degreeName":"Master's degree","fieldOfStudy":"Information Systems Engineering","startDate":"2017-01-01T00:00:00+01:00","endDate":"2019-01-01T00:00:00+01:00","durationInDays":731},{"schoolName":"Go My Code","degreeName":"full stack javascript","fieldOfStudy":"javascript","startDate":"2018-01-01T00:00:00+01:00","endDate":"2018-01-01T00:00:00+01:00","durationInDays":1},{"schoolName":"University of Tunis El Manar","degreeName":null,"fieldOfStudy":"Computer Science","startDate":"2014-01-01T00:00:00+01:00","endDate":"2017-01-01T00:00:00+01:00","durationInDays":1097}],"volunteerExperiences":[{"title":"Volunteer","company":"la volonte association of metline","startDate":"2012-01-01T00:00:00+01:00","endDate":"2021-04-28T03:44:27+02:00","endDateIsPresent":true,"description":"i learned a lot at la volonte association of metline,my job was to take care of the mediatisation of the association,neither to mention my participation in the activities in and abroad the country.","durationInDays":3406},{"title":"Volunteer","company":"Ijgd","startDate":"2016-07-01T00:00:00+02:00","endDate":"2021-04-28T03:44:27+02:00","endDateIsPresent":true,"description":"Workshop with the German organization Ijgd in leadership.","durationInDays":1763},{"title":"Volunteer","company":"MUNADHARA","startDate":"2017-09-01T00:00:00+02:00","endDate":"2021-04-28T03:44:27+02:00","endDateIsPresent":true,"description":"Workshop with MUNADHARA organization about Debating Skills.","durationInDays":1336}],"skills":[{"skillName":"java","endorsementCount":5},{"skillName":"angular 7","endorsementCount":4},{"skillName":"JavaScript","endorsementCount":2},{"skillName":"Programming","endorsementCount":1},{"skillName":"Web Development","endorsementCount":1},{"skillName":"Project Management","endorsementCount":3},{"skillName":"Software Development","endorsementCount":1},{"skillName":"Scrum","endorsementCount":1},{"skillName":"php","endorsementCount":3},{"skillName":"MySQL","endorsementCount":4},{"skillName":"Linux","endorsementCount":3},{"skillName":"Oracle Database","endorsementCount":2},{"skillName":"Unified Modeling Language (UML)","endorsementCount":2},{"skillName":"Spring Framework","endorsementCount":1},{"skillName":"Spring MVC","endorsementCount":1},{"skillName":"AngularJS","endorsementCount":1},{"skillName":"Java","endorsementCount":1},{"skillName":"Maven","endorsementCount":0},{"skillName":"Management","endorsementCount":3},{"skillName":"Leadership","endorsementCount":4},{"skillName":"Public Speaking","endorsementCount":4},{"skillName":"Critical Thinking","endorsementCount":0},{"skillName":"Presentation skills","endorsementCount":0},{"skillName":"Problem solver","endorsementCount":0},{"skillName":"Decision maker","endorsementCount":1},{"skillName":"Communication","endorsementCount":1},{"skillName":"Willingness to learn","endorsementCount":1},{"skillName":"Persistence","endorsementCount":0}]}
+{
+  "userProfile": {
+    "fullName": "Karim Maaoui",
+    "title": "Java Software Developer at Sofrecom Tunisie",
+    "location": {
+      "city": null,
+      "province": "Ariana Governorate",
+      "country": "Tunisia"
+    },
+    "photo": "https://media-exp1.licdn.com/dms/image/C4E35AQGt2iP8O87Ndg/profile-framedphoto-shrink_200_200/0/1610467079720?e=1619661600&v=beta&t=Zr97R8R7dYdzjimJnLNhsgfWztfU2uj13taZ6rNKJrk",
+    "description": null,
+    "url": "https://www.linkedin.com/in/maaoui-karim/"
+  },
+  "experiences": [
+    {
+      "title": "Java Software Developer",
+      "company": "Sofrecom Tunisie",
+      "employmentType": "Full-time",
+      "location": {
+        "city": null,
+        "province": null,
+        "country": "Tunisia"
+      },
+      "startDate": "2021-02-01T00:00:00+01:00",
+      "endDate": "2021-04-28T03:44:27+02:00",
+      "endDateIsPresent": true,
+      "description": null,
+      "durationInDays": 87
+    },
+    {
+      "title": "Full-stack Developer",
+      "company": "Fulfillment Bridge",
+      "employmentType": "Full-time",
+      "location": {
+        "city": null,
+        "province": "Gouvernorat de Tunis",
+        "country": "Tunisia"
+      },
+      "startDate": "2019-07-01T00:00:00+02:00",
+      "endDate": "2021-02-01T00:00:00+01:00",
+      "endDateIsPresent": false,
+      "description": null,
+      "durationInDays": 582
+    },
+    {
+      "title": "Full-stack Developer",
+      "company": "Gfi Tunisie",
+      "employmentType": "Full-time",
+      "location": {
+        "city": null,
+        "province": "Tunisie",
+        "country": null
+      },
+      "startDate": "2018-08-01T00:00:00+02:00",
+      "endDate": "2019-07-01T00:00:00+02:00",
+      "endDateIsPresent": false,
+      "description": null,
+      "durationInDays": 335
+    },
+    {
+      "title": "Internship Trainee",
+      "company": "Helios IT2",
+      "employmentType": null,
+      "location": null,
+      "startDate": "2017-02-01T00:00:00+01:00",
+      "endDate": "2017-06-01T00:00:00+02:00",
+      "endDateIsPresent": false,
+      "description": null,
+      "durationInDays": 121
+    }
+  ],
+  "education": [
+    {
+      "schoolName": "Université Sesame",
+      "degreeName": "Engineer's degree",
+      "fieldOfStudy": "Computer Software Engineering",
+      "startDate": "2018-01-01T00:00:00+01:00",
+      "endDate": "2020-01-01T00:00:00+01:00",
+      "durationInDays": 731
+    },
+    {
+      "schoolName": "University of Tunis El Manar",
+      "degreeName": "Master's degree",
+      "fieldOfStudy": "Information Systems Engineering",
+      "startDate": "2017-01-01T00:00:00+01:00",
+      "endDate": "2019-01-01T00:00:00+01:00",
+      "durationInDays": 731
+    },
+    {
+      "schoolName": "Go My Code",
+      "degreeName": "full stack javascript",
+      "fieldOfStudy": "javascript",
+      "startDate": "2018-01-01T00:00:00+01:00",
+      "endDate": "2018-01-01T00:00:00+01:00",
+      "durationInDays": 1
+    },
+    {
+      "schoolName": "University of Tunis El Manar",
+      "degreeName": null,
+      "fieldOfStudy": "Computer Science",
+      "startDate": "2014-01-01T00:00:00+01:00",
+      "endDate": "2017-01-01T00:00:00+01:00",
+      "durationInDays": 1097
+    }
+  ],
+  "volunteerExperiences": [
+    {
+      "title": "Volunteer",
+      "company": "la volonte association of metline",
+      "startDate": "2012-01-01T00:00:00+01:00",
+      "endDate": "2021-04-28T03:44:27+02:00",
+      "endDateIsPresent": true,
+      "description": "i learned a lot at la volonte association of metline,my job was to take care of the mediatisation of the association,neither to mention my participation in the activities in and abroad the country.",
+      "durationInDays": 3406
+    },
+    {
+      "title": "Volunteer",
+      "company": "Ijgd",
+      "startDate": "2016-07-01T00:00:00+02:00",
+      "endDate": "2021-04-28T03:44:27+02:00",
+      "endDateIsPresent": true,
+      "description": "Workshop with the German organization Ijgd in leadership.",
+      "durationInDays": 1763
+    },
+    {
+      "title": "Volunteer",
+      "company": "MUNADHARA",
+      "startDate": "2017-09-01T00:00:00+02:00",
+      "endDate": "2021-04-28T03:44:27+02:00",
+      "endDateIsPresent": true,
+      "description": "Workshop with MUNADHARA organization about Debating Skills.",
+      "durationInDays": 1336
+    }
+  ],
+  "skills": [
+    {
+      "skillName": "java",
+      "endorsementCount": 5
+    },
+    {
+      "skillName": "angular 7",
+      "endorsementCount": 4
+    },
+    {
+      "skillName": "JavaScript",
+      "endorsementCount": 2
+    },
+    {
+      "skillName": "Programming",
+      "endorsementCount": 1
+    },
+    {
+      "skillName": "Web Development",
+      "endorsementCount": 1
+    },
+    {
+      "skillName": "Project Management",
+      "endorsementCount": 3
+    },
+    {
+      "skillName": "Software Development",
+      "endorsementCount": 1
+    },
+    {
+      "skillName": "Scrum",
+      "endorsementCount": 1
+    },
+    {
+      "skillName": "php",
+      "endorsementCount": 3
+    },
+    {
+      "skillName": "MySQL",
+      "endorsementCount": 4
+    },
+    {
+      "skillName": "Linux",
+      "endorsementCount": 3
+    },
+    {
+      "skillName": "Oracle Database",
+      "endorsementCount": 2
+    },
+    {
+      "skillName": "Unified Modeling Language (UML)",
+      "endorsementCount": 2
+    },
+    {
+      "skillName": "Spring Framework",
+      "endorsementCount": 1
+    },
+    {
+      "skillName": "Spring MVC",
+      "endorsementCount": 1
+    },
+    {
+      "skillName": "AngularJS",
+      "endorsementCount": 1
+    },
+    {
+      "skillName": "Java",
+      "endorsementCount": 1
+    },
+    {
+      "skillName": "Maven",
+      "endorsementCount": 0
+    },
+    {
+      "skillName": "Management",
+      "endorsementCount": 3
+    },
+    {
+      "skillName": "Leadership",
+      "endorsementCount": 4
+    },
+    {
+      "skillName": "Public Speaking",
+      "endorsementCount": 4
+    },
+    {
+      "skillName": "Critical Thinking",
+      "endorsementCount": 0
+    },
+    {
+      "skillName": "Presentation skills",
+      "endorsementCount": 0
+    },
+    {
+      "skillName": "Problem solver",
+      "endorsementCount": 0
+    },
+    {
+      "skillName": "Decision maker",
+      "endorsementCount": 1
+    },
+    {
+      "skillName": "Communication",
+      "endorsementCount": 1
+    },
+    {
+      "skillName": "Willingness to learn",
+      "endorsementCount": 1
+    },
+    {
+      "skillName": "Persistence",
+      "endorsementCount": 0
+    }
+  ]
+}
