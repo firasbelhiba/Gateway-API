@@ -166,7 +166,7 @@ router.get("/scrape-tanitjob", async (req, res) => {
 
     fs.writeFileSync("data/tanitjobs/TJLinks.json", JSON.stringify(links));
 
-    jobTitlesTJ = JSON.parse("Scraped succefully ! ");
+    jobTitlesTJ = JSON.parse(jobTitleFromJson);
     locationAndCompanyTJ = JSON.parse(locationAndCompanyFromJson);
 
     res.json(locationAndCompanyTJ);
