@@ -354,18 +354,26 @@ const ProfileSchema = new mongoose.Schema({
   social: {
     youtube: {
       type: String,
+      default: "No Youtube link mentionned"
     },
     twitter: {
       type: String,
+      default: "No Twitter link mentionned"
+
     },
     facebook: {
       type: String,
+      default: "No Facebook link mentionned"
+
     },
     linkedin: {
       type: String,
+      default: "No Linkedin link mentionned"
+
     },
     instagram: {
       type: String,
+      default: "No Instagram link mentionned"
     },
   },
   views_profile: [
@@ -414,6 +422,47 @@ const ProfileSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
       },
+    },
+  ],
+  reviews: [
+    {
+      profile: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "profile",
+      },
+      text: {
+        type: String,
+      },
+      rate: {
+        type: Number,
+        require: true,
+      },
+      messages: [
+        {
+          profile: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "profile",
+          },
+          name: {
+            type: String,
+          },
+          avatar: {
+            type: String,
+          },
+          message: {
+            type: String,
+          },
+          date: {
+            type: Date,
+            default: Date.now,
+          },
+        },
+      ],
+      date: {
+        type: Date,
+        default: Date.now,
+      },
+
     },
   ],
   date: {

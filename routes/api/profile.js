@@ -124,11 +124,12 @@ router.post(
           newExperience.company = linkedinData.experiences[i].company;
         }
 
-        if (linkedinData.experiences[i].location.country === null) {
-          newExperience.location = "No location specified"
-        } else {
-          newExperience.location = linkedinData.experiences[i].location.country;
-        }
+        // if (linkedinData.experiences[i].location.country === null) {
+        //   newExperience.location = "No location specified"
+        // } else {
+        //   newExperience.location = linkedinData.experiences[i].location.country;
+        // }
+
 
         newExperience.from = linkedinData.experiences[i].startDate;
         newExperience.to = linkedinData.experiences[i].endDate;
@@ -1492,6 +1493,51 @@ router.get("/suggestion", auth, async (req, res) => {
     res.json(suggestionList);
   } catch (error) {
     console.error(error.message);
+    res.status(500).send("Server error");
+  }
+});
+
+
+//@author Firas Belhiba
+//@route POST api/profile/review/:id
+//@desc add a review
+//@access Private
+router.post("/review/:id", auth, async (req, res) => {
+  try {
+
+    const user = await User.findById(req.user.id).select("-password");
+    const myProfile = await Profile.findOne({ user: user._id });
+
+    const profile = await Profile.findOne({ _id: req.params.id });
+
+    if (!profile) {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+
+    const {
+      text,
+      rate,
+    } = req.body;
+
+    const newReview = {};
+
+    newReview.profile = myProfile._id;
+    newReview.text = text;
+    newReview.rate = rate;
+
+    profile.reviews.unshift(newReview);
+
+    await profile.save();
+
+    res.json(profile.reports);
+
+  } catch (error) {
+    console.error(error.message);
+
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+
     res.status(500).send("Server error");
   }
 });
