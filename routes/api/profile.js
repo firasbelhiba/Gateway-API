@@ -11,12 +11,18 @@ const User = require("../../models/User");
 const { route } = require("./posts");
 const cloudinary = require("../../utils/cloudinary");
 const upload = require("../../middleware/multer");
-const fs = require("fs");
+const fs = require("fs")
+
+const nodemailer = require('nodemailer');
+const sendgridTransport = require('nodemailer-sendgrid-transport');;
 
 
-const linkedinDataJSON = fs.readFileSync("././data/dataLinkedinProfile.json");
 
-let linkedinData = JSON.parse(linkedinDataJSON);
+const transporter = nodemailer.createTransport(sendgridTransport({
+  auth: {
+    api_key: config.get('mail_api_key')
+  }
+}));
 
 
 
@@ -43,42 +49,6 @@ router.post(
     const newExperience = {};
     const newEducation = {};
     const skills = []
-
-    profileFields.user = req.user.id;
-
-    if (linkedinData.userProfile.description === null) {
-      profileFields.bio = "No bio specified"
-    } else {
-      profileFields.bio = linkedinData.userProfile.description;
-    }
-
-    if (linkedinData.userProfile.fullName === null) {
-      profileFields.name = "No name specified"
-    } else {
-      profileFields.name = linkedinData.userProfile.fullName;
-    }
-
-    profileFields.avatar = linkedinData.userProfile.photo;
-
-    if (linkedinData.userProfile.location.city === null) {
-      profileFields.location = "No location specified"
-    } else {
-      profileFields.location = linkedinData.userProfile.location.city;
-    }
-
-    if (linkedinData.userProfile.title === null) {
-      profileFields.status = "No status specified"
-    } else {
-      profileFields.status = linkedinData.userProfile.title;
-    }
-
-
-    for (let i = 0; i < linkedinData.skills.length; i++) {
-      skills.push(linkedinData.skills[i].skillName)
-      profileFields.skills = skills;
-    }
-
-
 
     try {
 
@@ -107,9 +77,52 @@ router.post(
       let data = JSON.stringify(result)
       fs.writeFileSync('data/dataLinkedinProfile.json', data);
 
+
+
+      const linkedinDataJSON = fs.readFileSync("././data/dataLinkedinProfile.json");
+
+      let linkedinData = JSON.parse(linkedinDataJSON);
+
       let profile = await Profile.findOne({ user: req.user.id });
 
+
+      profileFields.user = req.user.id;
+
+      if (linkedinData.userProfile.description === null) {
+        profileFields.bio = "No bio specified"
+      } else {
+        profileFields.bio = linkedinData.userProfile.description;
+      }
+
+      if (linkedinData.userProfile.fullName === null) {
+        profileFields.name = "No name specified"
+      } else {
+        profileFields.name = linkedinData.userProfile.fullName;
+      }
+
+      profileFields.avatar = linkedinData.userProfile.photo;
+
+      // if (linkedinData.userProfile.location.city === null) {
+      //   profileFields.location = "No location specified"
+      // } else {
+      //   profileFields.location = linkedinData.userProfile.location.city;
+      // }
+
+      if (linkedinData.userProfile.title === null) {
+        profileFields.status = "No status specified"
+      } else {
+        profileFields.status = linkedinData.userProfile.title;
+      }
+
+
+      for (let i = 0; i < linkedinData.skills.length; i++) {
+        skills.push(linkedinData.skills[i].skillName)
+        profileFields.skills = skills;
+      }
+
+
       profile = new Profile(profileFields);
+
 
       for (let i = 0; i < linkedinData.experiences.length; i++) {
         if (linkedinData.experiences[i].title === null) {
@@ -144,6 +157,7 @@ router.post(
         profile.experience.unshift(newExperience)
       }
 
+
       for (let i = 0; i < linkedinData.education.length; i++) {
         if (linkedinData.education[i].fieldOfStudy === null) {
           newEducation.fieldofstudy = "No field study specified"
@@ -164,10 +178,21 @@ router.post(
           newEducation.degree = linkedinData.education[i].degreeName;
         }
 
-        newEducation.from = linkedinData.education[i].startDate;
-        newEducation.to = linkedinData.education[i].endDate;
+        if (linkedinData.education[i].startDate === "Invalid date") {
+          newEducation.from = ""
+        } else {
+          newEducation.from = linkedinData.education[i].startDate;
+        }
+        if (linkedinData.education[i].endDate === "Invalid date") {
+          newEducation.to = ""
+        } else {
+          newEducation.to = linkedinData.education[i].endDate;
+        }
+
         profile.education.unshift(newEducation)
       }
+
+
 
 
       await profile.save();
@@ -342,6 +367,40 @@ router.delete("/", auth, async (req, res) => {
 
     // Remove user
     await User.findOneAndRemove({ _id: req.user.id });
+
+    // whatever comes later
+    res.json({ message: "User deleted with success" });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server error");
+  }
+});
+
+//@author Firas Belhiba
+//@route DELETE api/profile
+//@desc Delete profile , user & posts by id
+//@access Private
+router.delete("/:id", async (req, res) => {
+  try {
+
+    const profile = await Profile.findOne({
+      _id: req.params.id,
+    }).populate("user", ["name", "avatar"]);
+
+    const user = await User.findOne({ _id: profile.user })
+
+    // Remove profile
+    await Profile.findOneAndRemove({ _id: req.params.id });
+
+    // Remove user
+    await User.findOneAndRemove({ _id: user._id });
+
+    await transporter.sendMail({
+      to: user.email,
+      from: "gatewayjustcode@gmail.com",
+      subject: "Sign up success",
+      html: "<h1>You account have been removed for some reasons , contact our service for more informations </h1>"
+    })
 
     // whatever comes later
     res.json({ message: "User deleted with success" });
