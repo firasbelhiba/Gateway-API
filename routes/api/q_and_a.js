@@ -5,6 +5,9 @@ const Question = require("../../models/Question");
 const Youtube = require("../../utils/youtube");
 const axios = require('axios');
 const config = require('config');
+const cheerio = require('cheerio');
+const request = require('request');
+
 
 //@author Motez Ayari
 //@Route GET api/users
@@ -661,8 +664,40 @@ router.get("/youtubeRec/:search", async (req, res) => {
     });
     console.log(req.params.search);
     const videos = response.data.items
+    try {
+        res.json(videos)
+    } catch (e) {
+        res.status(400).json('error: ' + e)
+    }
+});
 
-    res.json(videos)
+router.get('/blogRec/:search', async (req, res) => {
+    let datas = [];
+    request(`https://medium.com/search?q=${req.params.search}`, (err, response, html) => {
+
+        if (response.statusCode === 200) {
+            const $ = cheerio.load(html);
+
+            $('.js-block').each((i, el) => {
+
+                const title = $(el).find('h3').text();
+                const article = $(el).find('.postArticle-content').find('a').attr('href');
+
+                let data = {
+                    title,
+                    article
+                }
+
+                datas.push(data);
+
+            })
+        }
+        try {
+            res.json(datas);
+        } catch (e) {
+            res.status(400).json('error: ' + e)
+        }
+    });
 });
 
 module.exports = router;
