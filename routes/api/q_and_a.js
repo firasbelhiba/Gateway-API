@@ -150,27 +150,35 @@ router.post('/:idQ/upVote/:idU', (req, res) => {
             const vote = {
                 user: req.params.idU,
             }
-            Question.upVotes.push(vote);
 
+            var UpVotes = [];
+            for (var i in Question.upVotes)
+                UpVotes.push(Question.upVotes[i].user.toString());
+
+            var DownVote = [];
+            for (var i in Question.downVotes)
+                DownVote.push(Question.downVotes[i].user.toString());
+
+            if (UpVotes.includes(req.params.idU)) {
+                console.log('exist');
+                const userIndex = Question.upVotes
+                    .map((up => up.user.toString()))
+                    .indexOf(req.params.idU);
+                console.log(userIndex);
+                Question.upVotes.splice(userIndex, 1);
+            } else {
+                if (DownVote.includes(req.params.idU)) {
+                    const userDeleteIndex = Question.downVotes
+                        .map((up => up.user.toString()))
+                        .indexOf(req.params.idU);
+                    console.log(userDeleteIndex);
+                    Question.downVotes.splice(userDeleteIndex, 1);
+                }
+                console.log('doesnt exist')
+                Question.upVotes.push(vote);
+            }
             Question.save().then(() => {
-                console.log('voted');
-                res.json(Question.upVotes);
-            }).catch(err => {
-                res.status(400).json('error: ' + err);
-            })
-        }).catch(err => res.status(400).json('error: ' + err));
-    }
-);
-router.post('/:idQ/cancelUpVote/:idU', (req, res) => {
-        Question.findById(req.params.idQ).then(Question => {
-            const removeIndex = Question.upVotes
-                .map((upVote) => upVote.user.toString())
-                .indexOf(req.params.idU);
-
-            Question.upVotes.splice(removeIndex, 1);
-
-            Question.save().then(() => {
-                console.log('voted canceled');
+                console.log('upVoted Answer');
                 res.json(Question);
             }).catch(err => {
                 res.status(400).json('error: ' + err);
@@ -184,28 +192,35 @@ router.post('/:idQ/downVote/:idU', (req, res) => {
             const vote = {
                 user: req.params.idU,
             }
-            Question.downVotes.push(vote);
 
+            var DownVote = [];
+            for (var i in Question.downVotes)
+                DownVote.push(Question.downVotes[i].user.toString());
+
+            var UpVotes = [];
+            for (var i in Question.upVotes)
+                UpVotes.push(Question.upVotes[i].user.toString());
+
+            if (DownVote.includes(req.params.idU)) {
+                console.log('exist');
+                const userIndex = Question.downVotes
+                    .map((up => up.user.toString()))
+                    .indexOf(req.params.idU);
+                console.log(userIndex);
+                Question.downVotes.splice(userIndex, 1);
+            } else {
+                if (UpVotes.includes(req.params.idU)) {
+                    const userDeleteIndex = Question.upVotes
+                        .map((up => up.user.toString()))
+                        .indexOf(req.params.idU);
+                    console.log(userDeleteIndex);
+                    Question.upVotes.splice(userDeleteIndex, 1);
+                }
+                console.log('doesnt exist')
+                Question.downVotes.push(vote);
+            }
             Question.save().then(() => {
-                console.log('downvoted');
-                res.json(Question);
-            }).catch(err => {
-                res.status(400).json('error: ' + err);
-            })
-        }).catch(err => res.status(400).json('error: ' + err));
-    }
-);
-router.post('/:idQ/cancelDownVote/:idU', (req, res) => {
-        Question.findById(req.params.idQ).then(Question => {
-
-            const removeIndex = Question.downVotes
-                .map((downVote) => downVote.user.toString())
-                .indexOf(req.params.idU);
-
-            Question.downVotes.splice(removeIndex, 1);
-
-            Question.save().then(() => {
-                console.log('downvote canceled');
+                console.log('downVotes Answer');
                 res.json(Question);
             }).catch(err => {
                 res.status(400).json('error: ' + err);

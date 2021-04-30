@@ -100,6 +100,10 @@ const QuestionSchema = new Schema({
                     },
                 },
             ],
+            votes: {
+                type: Number,
+                default: 0,
+            },
             reports: [
                 {
                     user: {
