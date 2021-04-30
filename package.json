@@ -37,5 +37,8 @@
     "request": "^2.88.2",
     "socket.io": "^4.0.1",
     "text-censor": "^1.0.2"
+  },
+  "devDependencies": {
+    "axios": "^0.21.1"
   }
 }

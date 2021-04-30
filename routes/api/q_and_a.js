@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const User = require("../../models/User");
 const Question = require("../../models/Question");
-
+const Youtube = require("../../utils/youtube");
+const axios = require('axios');
+const config = require('config');
 
 //@author Motez Ayari
 //@Route GET api/users
@@ -642,6 +644,25 @@ router.post('/:idQ/unFollowQuestion/:idU', (req, res) => {
             res.status(400).json('error: ' + err);
         })
     }).catch(err => res.status(400).json('error: ' + err));
+});
+
+router.get("/youtubeRec/:search", async (req, res) => {
+    const response = await axios.create({
+        baseURL: 'https://www.googleapis.com/youtube/v3/',
+        params: {
+            part: 'snippet',
+            maxResults: 5,
+            key: config.get('YOUTUBE_KEY')
+        }
+    }).get('/search', {
+        params: {
+            q: req.params.search
+        }
+    });
+    console.log(req.params.search);
+    const videos = response.data.items
+
+    res.json(videos)
 });
 
 module.exports = router;
