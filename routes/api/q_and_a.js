@@ -621,7 +621,6 @@ router.post('/:idQ/followQuestion/:idU', (req, res) => {
             Question.following.push(follow);
 
             Question.save().then(() => {
-                console.log('followed');
                 Question.find().then(Questions => res.json(Questions))
             }).catch(err => {
                 res.status(400).json('error: ' + err);
@@ -638,7 +637,6 @@ router.post('/:idQ/unFollowQuestion/:idU', (req, res) => {
             .indexOf(req.params.idA);
         Question.following.splice(followIndex, 1);
         Question.save().then(() => {
-            console.log('follow canceled');
             Question.find().then(Questions => res.json(Questions))
         }).catch(err => {
             res.status(400).json('error: ' + err);
