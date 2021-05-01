@@ -397,7 +397,7 @@ router.put("/candidat/:id", auth, async (req, res) => {
       res.status(500).send("Server error");
     }
   });
-  
+
 //@author Iheb Laribi
 //@route put api/jobs/views/:id
 //@desc view a job
@@ -422,5 +422,42 @@ router.put("/views/:id", auth, async (req, res) => {
       res.status(500).send("Server error");
     }
   });  
+
+ //@author Iheb Laribi
+//@route Put api/jobs/applied/:id
+//@desc view a job
+//@access Private
+router.put("/applied/:id", auth, async (req, res) => {
+    try {
+      let job = await Job.findOne({ _id: req.params.id });
+      const user = await User.findById(req.user.id).select("-password");
+      const newapplied = {
+        appliedTo: user,
+  
+      };
+      if (!job) {
+        
+        return res.status(404).json({ message: "Post not Found " });
+      }
+      if ( job.appliedTo !== undefined ) {
+        
+        return res.status(404).json({ message: "already token " });
+      }
+  
+       job = await Job.findOneAndUpdate(
+        { _id: req.params.id },
+        { $set: newapplied },
+        { new: false }
+      );
+      await job.save();
+      res.json(job.appliedTo);
+    } catch (error) {
+      console.error(error.message);
+      if (error.kind === "ObjectId") {
+        return res.status(404).json({ message: "job not Found " });
+      }
+      res.status(500).send("Server error");
+    }
+  }); 
 
 module.exports = router;
