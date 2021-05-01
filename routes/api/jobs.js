@@ -688,6 +688,32 @@ router.post("/mail/:id", auth, async (req, res) => {
         res.status(500).json(err)
       }
     })
-  }); 
+  });
+ 
+  //@author Iheb Laribi
+//@route GET api/jobs/see/me
+//@desc Get current users jobs
+//@access Private
+router.get("/see/me", auth, async (req, res) => {
+    try {
+      const job = await Job.find({
+        user: req.user.id,
+      }).populate("user", ["name", "avatar"]);
+  
+      // If there is no existing job
+      if (!job) {
+        return res
+          .status(400)
+          .json({ message: "There is no job for this user " });
+      }
+  
+      // If there is a job
+      res.json(job);
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Server error");
+    }
+  });
+  
 
 module.exports = router;
