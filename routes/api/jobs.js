@@ -603,6 +603,22 @@ router.get("/Most/Viewed", async (req, res) => {
       console.error(error.message);
       res.status(500).send("Server error");
     }
+  });
+  
+ //@author Iheb Laribi
+//@Route GET api/jobs/jobsDetails
+// @Description  Test route 
+// @Access public 
+router.get("/Details/jobs/:id", async (req, res) => {
+    try {
+     
+    const  total= await Job.aggregate([{ $match : { _id : ObjectId(`${req.params.id}`) } },{ $project:{   totalLikes:{$size:["$likes"]},totalComments:{$size:["$comments"]},totalViews:{$size:["$views"]},totalreports:{$size:["$reports"]},totalcandidates:{$size:["$candidates"]}}}])
+     res.json(total[0]);
+      
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Server error");
+    }
   }); 
 
 module.exports = router;
