@@ -714,6 +714,14 @@ router.get("/see/me", auth, async (req, res) => {
       res.status(500).send("Server error");
     }
   });
+
+  router.get("/category/cat", auth, async (req, res) => {
+    request({
+      uri: 'https://opentdb.com/api_category.php',
+      
+      
+    }).pipe(res);;
+  }); 
   
 
 module.exports = router;
