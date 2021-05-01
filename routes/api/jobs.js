@@ -323,7 +323,45 @@ router.put("/comment/delete/:id/:id_com", auth, async (req, res) => {
           res.status(500).send("Server error");
         
       }
-  });  
+  });
 
+//@author Iheb Laribi
+//@route UPDATE api/jobs/comment/:id/:id_com
+//@desc update a comment
+//@access Private
+router.put(
+  "/comment/:id/:id_com",
+  [auth, [check("text", "Text is required").not().isEmpty()]],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const job = await Job.findOne({ _id: req.params.id });
+      const user = await User.findById(req.user.id).select("-password");
+      const newComment = {
+        user: user,
+        text: req.body.text,
+      };
+
+      //Get index
+      const updateIndex = job.comments
+        .map((item) => item.id)
+        .indexOf(req.params.id_com);
+
+        job.comments[updateIndex] = newComment;
+      await job.save();
+      res.json(job);
+    } catch (error) {
+      console.error(error.message);
+      if (error.kind === "ObjectId") {
+        return res.status(404).json({ message: "job not Found " });
+      }
+      res.status(500).send("Server error");
+    }
+  }
+);
 
 module.exports = router;
