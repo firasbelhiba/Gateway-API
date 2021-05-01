@@ -619,6 +619,22 @@ router.get("/Details/jobs/:id", async (req, res) => {
       console.error(error.message);
       res.status(500).send("Server error");
     }
-  }); 
+  });
+  
+  //@author Iheb Laribi
+//@Route GET api/jobs/candidates/Details
+// @Description  Test route 
+// @Access public 
+router.get("/Details/candidates/:id", async (req, res) => {
+    try {
+     
+    const  total= await Profile.aggregate([{ $match : { _id : ObjectId(`${req.params.id}`) } },{ $project:{   totalSavedJobs:{$size:["$savedJobs"]}}}])
+     res.json(total);
+      
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Server error");
+    }
+  });
 
 module.exports = router;
