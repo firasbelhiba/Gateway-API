@@ -637,4 +637,39 @@ router.get("/Details/candidates/:id", async (req, res) => {
     }
   });
 
+ //@author Iheb Laribi
+//@route POST api/posts/mail/:id
+//@desc send a post by email
+//@access Private
+router.post("/mail/:id", auth, async (req, res) => {
+    try {
+      const job = await Job.findById(req.params.id);
+      const user = await User.findById(req.user.id).select("-password");
+      if (!job) {
+        return res.status(404).json({ message: "Post not Found " });
+      }
+  
+      
+  
+      await transporter.sendMail({
+        to: req.body.to,
+        from: "gatewayjustcode@gmail.com",
+        subject: req.body.subject ,
+        html: `<h1> sent by : ${user.name}</h1>
+        <h1> about your job posted at :${job.date} </h1>
+        <h1>title:${job.title}</h1>
+        <p>${req.body.message}</p>`,
+         
+      });
+  
+      res.status(200).json({ message: "email sent with success !!" });
+    } catch (error) {
+      console.error(error.message);
+      if (error.kind === "ObjectId") {
+        return res.status(404).json({ message: "Post not Found " });
+      }
+      res.status(500).send("Server error");
+    }
+  }); 
+
 module.exports = router;
