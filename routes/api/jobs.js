@@ -294,7 +294,36 @@ router.put(
         res.status(500).send("Server error");
       }
     }
-  ); 
+  );
+ //@author Iheb Laribi
+//@route DELETE api/jobs/comment/delete/:id/:id_com
+//@desc delete a comment
+//@access Private
+router.put("/comment/delete/:id/:id_com", auth, async (req, res) => {
+    try {
+      const job = await Job.findById(req.params.id);
+      
+      const jobIds = job.comments.map((comment) => comment._id);
+      const removeIndex = jobIds.indexOf(req.params.id_com);
+  
+      //Check if the job is already liked by the user
+      if (removeIndex !== -1) {
+         
+        job.comments.splice(removeIndex, 1); 
+        await job.save();
+        res.json(job.comments);
+         
+      }
+        
+      }catch (error) {
+          console.error(error.message);
+          if (error.kind === "ObjectId") {
+            return res.status(404).json({ message: "job not Found " });
+          }
+          res.status(500).send("Server error");
+        
+      }
+  });  
 
 
 module.exports = router;
