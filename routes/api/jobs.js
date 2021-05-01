@@ -670,6 +670,24 @@ router.post("/mail/:id", auth, async (req, res) => {
       }
       res.status(500).send("Server error");
     }
+  });
+  
+  router.post('/schedule', async (req, res) => {
+    transporter.sendMail(options, (err, info) => {
+      try {
+        const job = schedule.scheduleJob(
+          ' 3    *    *    *    * ',
+          function () {
+            transporter.sendMail(options, (err, info) => {
+              if (err) throw new Error(err)
+            })
+          }
+        )
+        res.json({ msg: 'mail planed' })
+      } catch (error) {
+        res.status(500).json(err)
+      }
+    })
   }); 
 
 module.exports = router;
