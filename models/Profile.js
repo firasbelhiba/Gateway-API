@@ -469,6 +469,14 @@ const ProfileSchema = new mongoose.Schema({
 
         },
     ],
+    savedJobs: [
+        {
+          job: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "job",
+          },
+        },
+      ],
     date: {
         type: Date,
         default: Date.now,
