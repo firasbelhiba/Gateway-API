@@ -538,6 +538,42 @@ router.get(
         res.status(500).send("Server error");
       }
     }
-  ); 
+  );
+  
+  //@author Iheb Laribi
+//@route Put api/jobs/candidateSearch/:id
+//@desc search apply a job
+//@access Private
+router.get(
+    "/candidateSearch/:id",auth ,async (req, res) => {
+      
+      try {
+        
+        const job = await Job.findOne({ _id: req.params.id });
+  
+      if (!job) {
+        
+        return res.status(404).json({ message: "job not Found " });
+      }
+      const jobIds = job.candidates.map((candidate) => candidate.user.toString());
+      const removeIndex = jobIds.indexOf(req.user.id);
+  
+      //Check if the job is already liked by the user
+      if (removeIndex === -1) {
+         
+         res.json(false)}
+         else{
+          res.json(true)
+      } 
+    }catch (error) {
+        console.error(error.message);
+        if (error.kind === "ObjectId") {
+          return res.status(404).json({ message: "job not Found " });
+        }
+        res.status(500).send("Server error");
+      }
+    }
+  );
+  
 
 module.exports = router;
