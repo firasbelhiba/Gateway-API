@@ -590,4 +590,19 @@ router.get("/top/jobs", async (req, res) => {
     }
   });
 
+ //@author Iheb Laribi
+//@Route GET api/jobs/MostViewed
+// @Description  Test route 
+// @Access public 
+router.get("/Most/Viewed", async (req, res) => {
+    try {
+      const total= await Job.aggregate([{ $project:{ _id :"$_id", totalLikes:{$size:["$likes"]},totalComments:{$size:["$comments"]},totalViews:{$size:["$views"]},totalreports:{$size:["$reports"]}}},{ $match : { totalViews:{"$gte": 1}}},{ $sort:{ totalViews:-1}},{ $limit : 5}]);
+      
+      res.json(total);
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Server error");
+    }
+  }); 
+
 module.exports = router;
