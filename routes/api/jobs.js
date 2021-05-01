@@ -398,5 +398,29 @@ router.put("/candidat/:id", auth, async (req, res) => {
     }
   });
   
+//@author Iheb Laribi
+//@route put api/jobs/views/:id
+//@desc view a job
+//@access Private
+router.put("/views/:id", auth, async (req, res) => {
+    try {
+      const job = await Job.findOne({ _id: req.params.id });
+  
+      if (!job) {
+        
+        return res.status(404).json({ message: "Post not Found " });
+      }
+  
+      job.views.unshift({ user: req.user.id });
+      await job.save();
+      res.json(job.views);
+    } catch (error) {
+      console.error(error.message);
+      if (error.kind === "ObjectId") {
+        return res.status(404).json({ message: "job not Found " });
+      }
+      res.status(500).send("Server error");
+    }
+  });  
 
 module.exports = router;
