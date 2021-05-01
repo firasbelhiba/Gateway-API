@@ -11,9 +11,7 @@ const passport = require('passport');
 const { LinkedInProfileScraper } = require('linkedin-profile-scraper');
 const fs = require('fs');
 
-const linkedinDataJSON = fs.readFileSync("././data/dataLinkedinProfile.json");
 
-let linkedinData = JSON.parse(linkedinDataJSON);
 
 
 
@@ -100,7 +98,7 @@ router.post('/register-with-google', async (req, res) => {
 
         jwt.sign(payload, config.get('jwtSecret'), { expiresIn: 36000000 }, (err, token) => {
             if (err) throw err;
-            res.json({ token });
+            res.json({ token , user });
         })
 
     } catch (error) {
@@ -180,7 +178,7 @@ router.post('/', [
 
         jwt.sign(payload, config.get('jwtSecret'), { expiresIn: 36000000 }, (err, token) => {
             if (err) throw err;
-            res.json({ token });
+            res.json({ token, user });
         })
 
 
@@ -246,7 +244,7 @@ router.post('/facebook', async (req, res) => {
 
         jwt.sign(payload, config.get('jwtSecret'), { expiresIn: 36000000 }, (err, token) => {
             if (err) throw err;
-            res.json({ token });
+            res.json({ token , user });
         })
 
 
@@ -292,6 +290,10 @@ router.post('/linkedin', async (req, res) => {
         let data = JSON.stringify(result)
         fs.writeFileSync('data/dataLinkedinProfile.json', data);
 
+        const linkedinDataJSON = fs.readFileSync("././data/dataLinkedinProfile.json");
+
+        let linkedinData = JSON.parse(linkedinDataJSON);
+
         // Check user if already exist 
         let user = await User.findOne({ email });
 
@@ -333,7 +335,7 @@ router.post('/linkedin', async (req, res) => {
 
         jwt.sign(payload, config.get('jwtSecret'), { expiresIn: 36000000 }, (err, token) => {
             if (err) throw err;
-            res.json({ token });
+            res.json({ token , user});
         })
 
     } catch (error) {

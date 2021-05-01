@@ -42,6 +42,7 @@ router.post(
         }
         try {
             const user = await User.findById(req.user.id).select("-password");
+            const profile = await Profile.findOne({ user: user._id });
 
             const uploader = async (path) => await cloudinary.uploads(path, "Images");
             const urls = [];
@@ -59,8 +60,8 @@ router.post(
                 title: tc.filter(req.body.title),
                 text: tc.filter(req.body.text),
                 image: urls,
-                avatar: user.avatar,
-                name: user.name,
+                avatar: profile.avatar,
+                name: profile.name,
                 category: req.body.category,
             });
             const post = await newPost.save();
@@ -214,11 +215,14 @@ router.post(
         try {
             const post = await Post.findById(req.params.id);
             const user = await User.findById(req.user.id).select("-password");
+            const profile = await Profile.findOne({ user: user._id });
+
+
             const newComment = {
                 user: req.user.id,
                 text: tc.filter(req.body.text),
-                name: user.name,
-                avatar: user.avatar,
+                name: profile.name,
+                avatar: profile.avatar,
             };
 
             post.comments.unshift(newComment);
