@@ -128,7 +128,71 @@ router.delete("/:id", auth, async (req, res) => {
       }
       res.status(500).send("Server error");
     }
-  }); 
+  });
+  
+  //@author Iheb Laribi
+//@route UPDATE api/jobs/:id
+//@desc update a job
+//@access Private
+router.put(
+    "/:id",
+    [auth, [check('description', 'Text is required ').not().isEmpty(),
+    check('price', 'price is required').not().isEmpty(),
+    check('availability', 'availability is required').not().isEmpty(),
+    check('category', 'category is required').not().isEmpty(),
+    check('title', 'title is required').not().isEmpty(),
+    check('skills', 'Skills is required').not().isEmpty(),
+    check('location', 'location is required').not().isEmpty(),
+  ]],
+    
+    async (req, res) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+       const { description, price, availability, category, title , updatedAt , candidates, appliedTo, skills ,location} = req.body;
+      try {
+        const user = await User.findById(req.user.id).select("-password");
+        
+        const newJob = new Job({
+          _id : req.params.id,
+          user: user,
+          description,
+          price,
+          availability,
+          category,
+          title,
+          updatedAt,
+          candidates,
+          appliedTo,
+          location,
+          skills : skills
+        });
+  
+        let job = await Job.findOne({ _id: req.params.id });
+  
+        if (!job) {
+          return res.status(404).json({ message: "job not Found " });
+        }
+  
+        
+          job = await Job.findOneAndUpdate(
+            { _id: req.params.id },
+            { $set: newJob },
+            { new: true }
+          );
+          res.json(job);
+        
+        
+      } catch (error) {
+        console.error(error.message);
+        if (error.kind === "ObjectId") {
+          return res.status(404).json({ message: "Job not Found " });
+        }
+        res.status(500).send("Server error");
+      }
+    }
+  );
 
 
 module.exports = router;
