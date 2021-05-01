@@ -193,6 +193,38 @@ router.put(
       }
     }
   );
+ 
+  //@author Iheb Laribi
+//@route PUT api/jobs/like/:id
+//@desc Like a job
+//@access Private
+router.put("/like/:id", auth, async (req, res) => {
+    try {
+      const job = await Job.findById(req.params.id);
+      
+      const jobIds = job.likes.map((like) => like.user.toString());
+      const removeIndex = jobIds.indexOf(req.user.id);
+  
+      //Check if the job is already liked by the user
+      if (removeIndex !== -1) {
+         
+        job.likes.splice(removeIndex, 1); 
+         
+      }else{
+          job.likes.unshift({ user: req.user.id });
+        }
+        await job.save();
+        res.json(job.likes);
+      }catch (error) {
+          console.error(error.message);
+          if (error.kind === "ObjectId") {
+            return res.status(404).json({ message: "job not Found " });
+          }
+          res.status(500).send("Server error");
+        
+      }
+     
+  });
 
 
 module.exports = router;
