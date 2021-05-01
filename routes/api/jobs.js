@@ -83,5 +83,26 @@ router.get("/", async (req, res) => {
     }
   });  
 
+//@author Iheb Laribi
+//@route GET api/jobs/:id
+//@desc Get by id job
+//@access Public
+
+router.get("/:id", async (req, res) => {
+    try {
+      const job = await Job.findById(req.params.id);
+      res.json(job);
+      if (!job) {
+        return res.status(404).json({ message: "Job not Found " });
+      }
+    } catch (error) {
+      console.error(error.message);
+      if (error.kind === "ObjectId") {
+        return res.status(404).json({ message: "Job not Found " });
+      }
+      res.status(500).send("Server error");
+    }
+  });  
+
 
 module.exports = router;
