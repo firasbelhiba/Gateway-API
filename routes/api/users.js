@@ -340,7 +340,28 @@ router.post('/linkedin', async (req, res) => {
         console.error(error.message);
         res.status(500).send('Server error');
     }
-})
+});
+
+//@author Iheb Laribi
+//@route GET api/users/:id
+//@desc Get by id job
+//@access Public
+
+router.get("/:id", async (req, res) => {
+    try {
+      const user = await User.findById(req.params.id);
+      res.json(user);
+      if (!user) {
+        return res.status(404).json({ message: "user not Found " });
+      }
+    } catch (error) {
+      console.error(error.message);
+      if (error.kind === "ObjectId") {
+        return res.status(404).json({ message: "user not Found " });
+      }
+      res.status(500).send("Server error");
+    }
+  });
 
 
 
