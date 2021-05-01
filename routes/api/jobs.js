@@ -226,5 +226,40 @@ router.put("/like/:id", auth, async (req, res) => {
      
   });
 
+  //@author Iheb Laribi
+//@route Put api/jobs/comment/:id
+//@desc comment a job
+//@access Private
+router.put(
+    "/comment/:id",
+    [auth, [check("text", "Text must be required ").not().isEmpty()]],
+    async (req, res) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+      try {
+        const job = await Job.findById(req.params.id);
+        const user = await User.findById(req.user.id).select("-password");
+        const newComment = {
+          user: req.body.user,
+          text: req.body.text,
+          
+        };
+  
+        job.comments.unshift(newComment);
+  
+        await job.save();
+        res.json(job.comments);
+      } catch (error) {
+        console.error(error.message);
+        if (error.kind === "ObjectId") {
+          return res.status(404).json({ message: "job not Found " });
+        }
+        res.status(500).send("Server error");
+      }
+    }
+  );
+
 
 module.exports = router;
