@@ -506,4 +506,38 @@ router.put(
     }
   );
 
+ //@author Iheb Laribi
+//@route Put api/jobs/savedSearch/:id
+//@desc search save a job
+//@access Private
+router.get(
+    "/savedSearch/:id",auth ,async (req, res) => {
+      
+      try {
+        
+        let profile = await Profile.findOne({ user: req.user.id });
+        const removeIndex = profile.savedJobs
+          .map((savedJob) => savedJob.job)
+          .indexOf(req.params.id);
+         
+  
+        if (
+          removeIndex !== -1
+        ) {     
+            return res.json(true) 
+        }else{
+                
+          return res.json(false) 
+               
+        }   
+      } catch (error) {
+        console.error(error.message);
+        if (error.kind === "ObjectId") {
+          return res.status(404).json({ message: "job not Found " });
+        }
+        res.status(500).send("Server error");
+      }
+    }
+  ); 
+
 module.exports = router;
