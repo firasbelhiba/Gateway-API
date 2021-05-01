@@ -18,6 +18,7 @@
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "express": "^4.17.1",
+    "express-pino-logger": "^6.0.0",
     "express-validator": "^6.10.0",
     "fs": "0.0.1-security",
     "geoip-lite": "^1.4.2",
@@ -37,7 +38,8 @@
     "puppeteer": "^9.0.0",
     "request": "^2.88.2",
     "socket.io": "^4.0.1",
-    "text-censor": "^1.0.2"
+    "text-censor": "^1.0.2",
+    "twilio": "^3.61.0"
   },
   "devDependencies": {
     "axios": "^0.21.1"
