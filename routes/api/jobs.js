@@ -68,6 +68,20 @@ router.post(
       }
     }
   );
+ 
+//@author Iheb Laribi
+//@Route GET api/jobs
+// @Description  Test route 
+// @Access Public 
+router.get("/", async (req, res) => {
+    try {
+      const jobs = await Job.find().sort({ date: -1 });
+      res.json(jobs);
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send("Server error");
+    }
+  });  
 
 
 module.exports = router;
