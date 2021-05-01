@@ -650,7 +650,7 @@ router.post('/:idQ/unFollowQuestion/:idU', (req, res) => {
 });
 
 router.get("/youtubeRec/:search", async (req, res) => {
-    const response = await axios.create({
+    await axios.create({
         baseURL: 'https://www.googleapis.com/youtube/v3/',
         params: {
             part: 'snippet',
@@ -661,14 +661,17 @@ router.get("/youtubeRec/:search", async (req, res) => {
         params: {
             q: req.params.search
         }
-    });
-    console.log(req.params.search);
-    const videos = response.data.items
-    try {
+    }).then(response => {
+        console.log(req.params.search);
+        const videos = response.data.items
         res.json(videos)
-    } catch (e) {
-        res.status(400).json('error: ' + e)
-    }
+    }).catch(
+        err => {
+            console.log('errors:' + err)
+            res.status(400).json('error: ' + err)
+        }
+    )
+
 });
 
 router.get('/blogRec/:search', async (req, res) => {
@@ -692,11 +695,7 @@ router.get('/blogRec/:search', async (req, res) => {
 
             })
         }
-        try {
-            res.json(datas);
-        } catch (e) {
-            res.status(400).json('error: ' + e)
-        }
+        res.json(datas);
     });
 });
 
