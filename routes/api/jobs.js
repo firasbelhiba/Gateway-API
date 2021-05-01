@@ -721,7 +721,19 @@ router.get("/see/me", auth, async (req, res) => {
       
       
     }).pipe(res);;
-  }); 
+  });
+  
+  router.get("/quiz/:quizNumber/:id/:difficulty", auth, async (req, res) => {
+    request({
+      uri: 'https://opentdb.com/api.php',
+      qs: {
+        amount: req.params.quizNumber,
+        category: req.params.id,
+        difficulty:req.params.difficulty
+      }
+    }).pipe(res);
+  });
+   
   
 
 module.exports = router;
