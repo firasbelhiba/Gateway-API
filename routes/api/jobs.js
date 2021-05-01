@@ -260,6 +260,41 @@ router.put(
       }
     }
   );
+ 
+ //@author Iheb Laribi
+//@route Put api/jobs/report/:id
+//@desc report a job
+//@access Private
+router.put(
+    "/report/:id",
+    [auth, [check("reason", "reason must be required ").not().isEmpty()]],
+    async (req, res) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+      try {
+        const job = await Job.findById(req.params.id);
+        const user = await User.findById(req.user.id).select("-password");
+        const newReport = {
+          user: req.body.user,
+          reason: req.body.reason,
+          
+        };
+  
+        job.reports.unshift(newReport);
+  
+        await job.save();
+        res.json(job.reports);
+      } catch (error) {
+        console.error(error.message);
+        if (error.kind === "ObjectId") {
+          return res.status(404).json({ message: "job not Found " });
+        }
+        res.status(500).send("Server error");
+      }
+    }
+  ); 
 
 
 module.exports = router;
