@@ -103,6 +103,32 @@ router.get("/:id", async (req, res) => {
       res.status(500).send("Server error");
     }
   });  
+ 
+ //@author iHEB Laribi
+//@route DELETE api/jobs/:id
+//@desc DELETE by id job
+//@access Private
+
+router.delete("/:id", auth, async (req, res) => {
+    try {
+      const job = await Job.findById(req.params.id);
+  
+      //Check if the user owns the post
+      if (job.user.toString() !== req.user.id) {
+        return res
+          .status(404)
+          .json({ message: "You are not authorized to delete this job " });
+      }
+      await job.remove();
+      res.json({ message: "Job Deleted" });
+    } catch (error) {
+      console.error(error.message);
+      if (error.kind === "ObjectId") {
+        return res.status(404).json({ message: "Job not Found " });
+      }
+      res.status(500).send("Server error");
+    }
+  }); 
 
 
 module.exports = router;
