@@ -733,6 +733,35 @@ router.get("/see/me", auth, async (req, res) => {
       }
     }).pipe(res);
   });
+
+  // news category
+  router.get("/category/news", auth, async (req, res) => {
+    request({
+      uri: 'https://newsapi.org/v2/sources?',
+      qs: {
+        language: "en",
+        apiKey: config.get("REACT_NEWS_API_KEY"),
+        
+      }
+      
+      
+    }).pipe(res);;
+  });
+
+  // news category
+  router.get("/articles/news/:id", auth, async (req, res) => {
+    request({
+      uri: 'https://newsapi.org/v2/top-headlines?',
+      qs: {
+        sources: req.params.id,
+        apiKey: config.get("REACT_NEWS_API_KEY"),
+        
+      }
+      
+      
+    }).pipe(res);;
+  });
+   
    
   
 
