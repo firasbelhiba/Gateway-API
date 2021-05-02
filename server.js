@@ -34,10 +34,10 @@ app.get("/", async (req, res) => {
 app.use(express.json({ extended: false }));
 
 const cors = require('cors');
-const corsOptions ={
-    origin:'http://localhost:3000', 
-    credentials:false,            //access-control-allow-credentials:true
-    optionSuccessStatus:200
+const corsOptions = {
+  origin: 'http://localhost:3000',
+  credentials: false,            //access-control-allow-credentials:true
+  optionSuccessStatus: 200
 }
 
 app.use(cors(corsOptions));
@@ -75,7 +75,7 @@ const { videoToken } = require('./tokens');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(pino);
+//app.use(pino);
 
 const sendTokenResponse = (token, res) => {
   res.set('Content-Type', 'application/json');
@@ -95,14 +95,14 @@ app.get('/api/greeting', (req, res) => {
 app.get('/video/token', (req, res) => {
   const identity = req.query.identity;
   const room = req.query.room;
-  const token = videoToken(identity, room );
+  const token = videoToken(identity, room);
   sendTokenResponse(token, res);
 
 });
 app.post('/video/token', (req, res) => {
   const identity = req.body.identity;
   const room = req.body.room;
-  const token = videoToken(identity, room );
+  const token = videoToken(identity, room);
   sendTokenResponse(token, res);
 });
 

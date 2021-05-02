@@ -211,38 +211,171 @@ router.get("/get-scraped-data-tanitjob", async (req, res) => {
 });
 
 
-
 //@author Ghada Khedri
-//@route GET api/scrape/get-scraped-data-tanitjob
+//@route GET api/scrape/scrape-indeed
 //@desc scrape jobs
 //@access Private
-// router.get("/get-scraped-data-tanitjob", async (req, res) => {
-//   try {
-//     let scrapeList = [];
-//     let scrapeLocation = [];
-//     let scrapeCompany = [];
+router.get("/scrape-indeed", async (req, res) => {
+  try {
+    console.log('indeed')
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
+    await page.goto("https://www.indeed.com/companies/search?q=&l=Tunis%2C+AR&from=discovery-cmp-front-door");
+    const html = await page.evaluate(() => document.body.innerHTML);
+    const $ = await cheerio.load(html);
 
-//     for (let i = 0; i < locationAndCompanyTJ.length; i += 2) {
-//       scrapeCompany.push(locationAndCompanyTJ[i]);
-//     }
+    console.log("1");
 
-//     for (let i = 1; i < locationAndCompanyTJ.length; i += 2) {
-//       scrapeLocation.push(locationAndCompanyTJ[i]);
-//     }
+    let indeedLinks = [];
+    let indeedJobTitlesAndRates = [];
+    let indeedDescription = [];
+    let indeedImages = [];
 
-//     for (let i = 0; i < 5; i++) {
-//       scrapeList.push({
-//         title: jobTitlesTJ[i],
-//         link: linksTJ[i],
-//         company: scrapeCompany[i],
-//         location: scrapeLocation[i],
-//       });
-//     }
-//     res.json(jobTitlesTJ);
-//   } catch (error) {
-//     console.error(error.message);
-//     res.status(500).send("Server error");
-//   }
-// });
+
+    $(".cmp-CompanyWidget-details").each((i, element) => {
+      indeedLinks.push($(element).find("a").attr("href"));
+      indeedJobTitlesAndRates.push($(element).find("a").text());
+    });
+
+    $(".cmp-CompanyWidget-description").each((i, element) => {
+      indeedDescription.push($(element).text());
+    });
+
+    $(".icl-CompanyLogo").each((i, element) => {
+      indeedImages.push($(element).find("img").attr("src"));
+    });
+
+
+    let indeedJobTitles = [];
+    let indeedRate = [];
+
+    for (let i = 0; i < indeedJobTitlesAndRates.length; i++) {
+      let str1 = indeedJobTitlesAndRates[i];
+      let str2 = indeedJobTitlesAndRates[i];
+
+      str1 = str1.substring(0, str1.length - 3);
+      str2 = str2.slice(str2.length - 3);
+
+      indeedJobTitles.push(str1);
+      indeedRate.push(str2)
+
+    }
+
+
+    fs.writeFileSync("data/indeed/indeedJobsTitle.json", JSON.stringify(indeedJobTitles));
+    fs.writeFileSync("data/indeed/indeedRate.json", JSON.stringify(indeedRate));
+    fs.writeFileSync("data/indeed/indeedDescription.json", JSON.stringify(indeedDescription));
+    fs.writeFileSync("data/indeed/indeedImages.json", JSON.stringify(indeedImages));
+    fs.writeFileSync("data/indeed/indeedLinks.json", JSON.stringify(indeedLinks));
+
+    console.log("2");
+
+    res.json({ message: "Scraped succefully ! " });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server error");
+  }
+});
+
+
+//Indeed
+const indeedJobTitleFromJson = fs.readFileSync(
+  "././data/indeed/indeedJobsTitle.json"
+);
+
+const indeedDescriptionFromJson = fs.readFileSync(
+  "././data/indeed/indeedDescription.json"
+);
+
+const indeedRateFromJson = fs.readFileSync(
+  "././data/indeed/indeedRate.json"
+);
+
+const indeedImageseFromJson = fs.readFileSync(
+  "././data/indeed/indeedImages.json"
+);
+
+const indeedLinkFromJson = fs.readFileSync(
+  "././data/indeed/indeedLinks.json"
+);
+
+
+// Indeed 
+let indeedJobTitlesList = JSON.parse(indeedJobTitleFromJson);
+let indeedDescriptionList = JSON.parse(indeedDescriptionFromJson);
+let indeedJobRateList = JSON.parse(indeedRateFromJson);
+let indeedImagesList = JSON.parse(indeedImageseFromJson);
+let indeedLinksList = JSON.parse(indeedLinkFromJson);
+
+
+
+
+//@author Ghada Khedri
+//@route GET api/scrape/get-scraped-data-indeed
+//@desc scrape jobs
+//@access Private
+router.get("/get-scraped-data-indeed", async (req, res) => {
+  try {
+
+    let scrapeList = [];
+
+
+    for (let i = 0; i < 5; i++) {
+      scrapeList.push({
+        title: indeedJobTitlesList[i],
+        description: indeedDescriptionList[i],
+        rate: indeedJobRateList[i],
+        image: indeedImagesList[i],
+        link: indeedLinksList[i],
+      });
+    }
+    res.json(scrapeList);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server error");
+  }
+});
+
+
+
+//@author Ghada Khedri
+//@route GET api/scrape/scrape-udemy
+//@desc scrape jobs
+//@access Private
+router.get("/scrape-udemy", async (req, res) => {
+  try {
+    console.log('udemy')
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
+    await page.goto("https://www.udemy.com/");
+    const html = await page.evaluate(() => document.body.innerHTML);
+    const $ = await cheerio.load(html);
+
+    console.log("1");
+
+
+    udemyImages = [];
+    udemyJobsTitle = [];
+
+    //carousel--scroll-item--3Wciz
+    $(".course-card--image-wrapper--Sxd90").each((i, element) => {
+      udemyImages.push($(element).find("img").attr("src"));
+    });
+
+    //udlite-focus-visible-target udlite-heading-md course-card--course-title--2f7tE
+    $(".course-card--course-title--2f7tE").each((i, element) => {
+      udemyJobsTitle.push($(element).text());
+    });
+
+    console.log("2");
+
+    res.json(udemyJobsTitle);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server error");
+  }
+});
+
+
 
 module.exports = router;
