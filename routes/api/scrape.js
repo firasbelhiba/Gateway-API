@@ -339,37 +339,159 @@ router.get("/get-scraped-data-indeed", async (req, res) => {
 
 
 //@author Ghada Khedri
-//@route GET api/scrape/scrape-udemy
+//@route GET api/scrape/scrape-edx
 //@desc scrape jobs
 //@access Private
-router.get("/scrape-udemy", async (req, res) => {
+router.get("/scrape-edx", async (req, res) => {
   try {
-    console.log('udemy')
+    console.log('edx')
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
-    await page.goto("https://www.udemy.com/");
+    await page.goto("https://www.edx.org/course/subject/computer-science");
     const html = await page.evaluate(() => document.body.innerHTML);
     const $ = await cheerio.load(html);
 
     console.log("1");
 
 
-    udemyImages = [];
-    udemyJobsTitle = [];
+    edxTitles = [];
+    edxDescription = [];
+    edxLinks = [];
+    edxCertificate = [];
+    edxNumberOfCourses = [];
 
-    //carousel--scroll-item--3Wciz
-    $(".course-card--image-wrapper--Sxd90").each((i, element) => {
-      udemyImages.push($(element).find("img").attr("src"));
+
+    $(".card-body").each((i, element) => {
+      edxTitles.push($(element).find("h2").text());
+      edxDescription.push($(element).find("h3").text());
+      edxLinks.push($(element).find("a").attr("href"));
     });
 
-    //udlite-focus-visible-target udlite-heading-md course-card--course-title--2f7tE
-    $(".course-card--course-title--2f7tE").each((i, element) => {
-      udemyJobsTitle.push($(element).text());
+    $(".course-count").each((i, element) => {
+      edxNumberOfCourses.push($(element).text());
+    });
+
+    $(".program-type").each((i, element) => {
+      edxCertificate.push($(element).find("span").text());
     });
 
     console.log("2");
 
-    res.json(udemyJobsTitle);
+
+    fs.writeFileSync("data/edx/edxTitles.json", JSON.stringify(edxTitles));
+    fs.writeFileSync("data/edx/edxDescription.json", JSON.stringify(edxDescription));
+    fs.writeFileSync("data/edx/edxCertificate.json", JSON.stringify(edxCertificate));
+    fs.writeFileSync("data/edx/edxNumberOfCourses.json", JSON.stringify(edxNumberOfCourses));
+    fs.writeFileSync("data/edx/edxLinks.json", JSON.stringify(edxLinks));
+
+
+    res.json({ message: "Scraped succefully ! " })
+
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server error");
+  }
+});
+
+
+
+//Edx
+const edxTitlesFromJson = fs.readFileSync(
+  "././data/edx/edxTitles.json"
+);
+
+const edxDescriptionFromJson = fs.readFileSync(
+  "././data/edx/edxDescription.json"
+);
+
+const edxCertificateFromJson = fs.readFileSync(
+  "././data/edx/edxCertificate.json"
+);
+
+const edxNumberOfCoursesFromJson = fs.readFileSync(
+  "././data/edx/edxNumberOfCourses.json"
+);
+
+const edxLinksFromJson = fs.readFileSync(
+  "././data/edx/edxLinks.json"
+);
+
+
+// Edx 
+let edxTitlesList = JSON.parse(edxTitlesFromJson);
+let edxDescriptionList = JSON.parse(edxDescriptionFromJson);
+let edxCertificateList = JSON.parse(edxCertificateFromJson);
+let edxNumberOfCoursesList = JSON.parse(edxNumberOfCoursesFromJson);
+let edxLinksList = JSON.parse(edxLinksFromJson);
+
+
+
+
+// //@author Ghada Khedri
+// //@route GET api/scrape/get-scraped-data-indeed
+// //@desc scrape jobs
+// //@access Private
+router.get("/get-scraped-data-edx", async (req, res) => {
+  try {
+
+    let scrapeList = [];
+
+
+    for (let i = 0; i < 5; i++) {
+      scrapeList.push({
+        title: edxTitlesList[i],
+        description: edxDescriptionList[i],
+        certification: edxCertificateList[i],
+        numberOfCertification: edxNumberOfCoursesList[i],
+        link: edxLinksList[i],
+      });
+    }
+    res.json(scrapeList);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server error");
+  }
+});
+
+
+
+
+//@author Ghada Khedri
+//@route GET api/scrape/scrape-freecourseonline
+//@desc scrape jobs
+//@access Private
+router.get("/scrape-freecourse", async (req, res) => {
+  try {
+    console.log('freecourse')
+    const browser = await puppeteer.launch({ headless: true });
+    const page = await browser.newPage();
+    await page.goto("https://www.freecoursesonline.me/?1");
+    const html = await page.evaluate(() => document.body.innerHTML);
+    const $ = await cheerio.load(html);
+
+    console.log("1");
+
+    let freecourseImages = [];
+    let freecourseTitle = [];
+
+
+    $(".post-img").each((i, element) => {
+      freecourseImages.push($(element).find("img").attr("src"));
+    });
+
+    $(".post-title").each((i, element) => {
+      freecourseTitle.push($(element).find("a").text());
+    });
+
+
+    console.log("2");
+
+
+
+
+
+    res.json(freecourseTitle)
+
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server error");
