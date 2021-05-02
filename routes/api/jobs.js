@@ -34,7 +34,7 @@ router.post(
     check('availability', 'availability is required').not().isEmpty(),
     check('category', 'category is required').not().isEmpty(),
     check('title', 'title is required').not().isEmpty(),
-    
+    check('skills', 'Skills is required').not().isEmpty(),
     check('location', 'location is required').not().isEmpty(),
   ]],
     
@@ -48,7 +48,7 @@ router.post(
         const user = await User.findById(req.user.id).select("-password");
   
         const newJob = new Job({
-          user: user,
+          user: req.user.id,
           description,
           price,
           availability,
@@ -61,6 +61,7 @@ router.post(
           skills 
         });
         const job = await newJob.save();
+        
         res.json(job);
       } catch (error) {
         console.error(error.message);
@@ -168,7 +169,7 @@ router.put(
           location,
           skills : skills
         });
-  
+        
         let job = await Job.findOne({ _id: req.params.id });
   
         if (!job) {
