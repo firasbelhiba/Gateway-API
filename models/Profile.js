@@ -471,12 +471,44 @@ const ProfileSchema = new mongoose.Schema({
     ],
     savedJobs: [
         {
-          job: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "job",
-          },
+            job: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "job",
+            },
         },
-      ],
+    ],
+    score: [
+        {
+            profile: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "profile",
+            },
+            total_score: {
+                type: Number,
+                default: 0,
+            },
+            level: {
+                type: Number,
+                default: 0,
+            },
+            per_category: [
+                {
+                    score: {
+                        type: Number,
+                        default: 0,
+                    },
+                    category: {
+                        type: String,
+                        default: "python"
+                    },
+                    badge: {
+                        type: String,
+                        default: "Beginner"
+                    },
+                },
+            ],
+        },
+    ],
     date: {
         type: Date,
         default: Date.now,
