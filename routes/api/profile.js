@@ -292,6 +292,15 @@ router.post(
 
             // If profile does not exist than create profile
             profile = new Profile(profileFields);
+
+            const newScore = {
+                profile: profile._id,
+                total_score: 0,
+                level: 1,
+            }
+
+            await profile.score.unshift(newScore)
+
             await profile.save();
             res.json(profile);
         } catch (error) {
@@ -939,7 +948,7 @@ router.post("/report/:id", auth, async (req, res) => {
         const profile = await Profile.findOne({ _id: req.params.id });
 
         if (!profile) {
-            return res.status(404).json({ message: "Post not Found " });
+            return res.status(404).json({ message: "Profile not Found " });
         }
 
         profile.reports.unshift({ user: req.user.id });
@@ -951,7 +960,7 @@ router.post("/report/:id", auth, async (req, res) => {
         console.error(error.message);
 
         if (error.kind === "ObjectId") {
-            return res.status(404).json({ message: "Post not Found " });
+            return res.status(404).json({ message: "Profile not Found " });
         }
 
         res.status(500).send("Server error");
@@ -1598,4 +1607,113 @@ router.get("/most-viewed-people", auth, async (req, res) => {
     }
 });
 
+
+
+//@author Ghada Khedri & Firas Belhiba 
+//@route GET api/profile/add-score
+//@desc add score points 
+//@access Private
+router.post("/add-score", auth, async (req, res) => {
+    try {
+
+        const profile = await Profile.findOne({ user: req.user.id });
+
+        const { score, category } = req.body;
+
+        if (profile.score[0].per_category.length === 0) {
+            const newScorePerCategory = {
+                score: 0,
+                category: category,
+                badge: "Beginner"
+            }
+            profile.score[0].per_category.unshift(newScorePerCategory);
+        }
+
+
+        if (!profile.score[0].per_category.some(el => el.category === category)) {
+            const newScorePerCategory = {
+                score: 0,
+                category: category,
+                badge: "Beginner"
+            }
+            profile.score[0].per_category.unshift(newScorePerCategory);
+        }
+
+        profile.score[0].per_category.find(item => item.category === category).score = profile.score[0].per_category.find(item => item.category === category).score + score
+
+
+        profile.score[0].total_score = profile.score[0].total_score + score
+
+        // Levels 
+        if (profile.score[0].total_score >= 0 && profile.score[0].total_score < 1000) {
+            profile.score[0].level = 1;
+        }
+        else if (profile.score[0].total_score >= 1000 && profile.score[0].total_score < 2000) {
+            profile.score[0].level = 2;
+        }
+        else if (profile.score[0].total_score >= 2000 && profile.score[0].total_score < 3000) {
+            profile.score[0].level = 3;
+        }
+        else if (profile.score[0].total_score >= 3000 && profile.score[0].total_score < 4000) {
+            profile.score[0].level = 4;
+        }
+        else if (profile.score[0].total_score >= 5000) {
+            profile.score[0].level = 5;
+        }
+
+        //Badges 
+        for (let i = 0; i < profile.score[0].per_category.length; i++) {
+            if (profile.score[0].per_category[i].score >= 0 && profile.score[0].per_category[i].score < 1000) {
+                profile.score[0].per_category[i].badge = "Beginner"
+            }
+            else if (profile.score[0].per_category[i].score >= 1000 && profile.score[0].per_category[i].score < 3000) {
+                profile.score[0].per_category[i].badge = "Intermediate "
+            }
+            else if (profile.score[0].per_category[i].score >= 3000 && profile.score[0].per_category[i].score < 6000) {
+                profile.score[0].per_category[i].badge = "Advanced"
+            }
+            else if (profile.score[0].per_category[i].score >= 6000 && profile.score[0].per_category[i].score < 12000) {
+                profile.score[0].per_category[i].badge = "Expert"
+            }
+            else if (profile.score[0].per_category[i].score >= 12000) {
+                profile.score[0].per_category[i].badge = "Master"
+            }
+        }
+
+        await profile.save();
+
+        res.json(profile.score[0]);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send("Server error");
+    }
+});
+
+
 module.exports = router;
+
+
+
+// const newScore = {
+//     profile: profile._id,
+//     total_score: 1500,
+//     level: 2,
+// }
+
+// await profile.score.unshift(newScore)
+
+
+
+
+
+
+
+// const x = {
+//     score: 100,
+//     category: "python",
+//     badge: "Beginner"
+// }
+
+
+
+// profile.score[0].per_category.unshift(x);
