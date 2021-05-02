@@ -476,8 +476,8 @@ router.delete("/shared/:id/:id_share", auth, async (req, res) => {
 
     //Get index
     const removeIndex = profile.shared
-      .map((share) => share.user.toString())
-      .indexOf(req.user.id);
+      .map((share) => share._id.toString())
+      .indexOf(req.params.id_share);
 
     profile.shared.splice(removeIndex, 1);
     await profile.save();
