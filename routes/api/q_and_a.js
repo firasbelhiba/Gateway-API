@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const User = require("../../models/User");
 const Question = require("../../models/Question");
-const Youtube = require("../../utils/youtube");
+const SavedNews = require("../../models/SavedNews");
 const axios = require('axios');
 const config = require('config');
 const cheerio = require('cheerio');
@@ -700,12 +700,13 @@ router.get('/blogRec/:search', async (req, res) => {
     });
 });
 
-router.get('/newsRex/:search', async (req, res) => {
+router.get('/newsRec/:search', async (req, res) => {
     try {
         const articles = await googleNewsScraper({
             searchTerm: req.params.search,
             prettyURLs: true,
-            timeframe: "5d",
+            timeframe: "1d",
+            timeout: 0,
             puppeteerArgs: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox'
@@ -718,5 +719,102 @@ router.get('/newsRex/:search', async (req, res) => {
     }
 });
 
+router.get('/newsRecSkills/:search', async (req, res) => {
+    try {
+        const articles = await googleNewsScraper({
+            searchTerm: req.params.search,
+            prettyURLs: true,
+            timeframe: "3d",
+            timeout: 0,
+            puppeteerArgs: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox'
+            ]
+        })
+        res.json(articles)
+        console.log(articles)
+    } catch (e) {
+        console.error(e)
+    }
+});
+
+router.post('/saveNews/:idU', (req, res) => {
+        const user = req.params.idU;
+        const title = req.body.title;
+        const subtitle = req.body.subtitle;
+        const link = req.body.link;
+        const image = req.body.image;
+        const source = req.body.source;
+        const time = req.body.time;
+        const newNews = {
+            title,
+            subtitle,
+            link,
+            image,
+            source,
+            time,
+        };
+        SavedNews.findOne({'user': user}, function (err, docs) {
+            if (docs) {
+                SavedNews.findOne({'user': user}).then(saved => {
+                        const savedIndex = saved.list.map((news) => news.link.toString())
+                            .indexOf(link);
+                        console.log(savedIndex);
+                        if (savedIndex === -1) {
+                            saved.list.push(newNews);
+                            saved.save().then(() => {
+                                res.json(saved.list)
+                            }).catch(err => {
+                                res.status(400).json('error: ' + err)
+                            })
+                        }
+                    }
+                )
+            } else {
+                const list = []
+                list.push(newNews)
+                const Saved = new SavedNews({
+                    user,
+                    list
+                });
+                Saved.save().then(() => {
+                    res.json(Saved.list)
+                }).catch(err => {
+                    res.status(400).json('error: ' + err)
+                });
+            }
+        });
+    }
+)
+
+router.post('/cancelSaveNews/:idU/:idN', (req, res) => {
+        const user = req.params.idU;
+        SavedNews.findOne({'user': user}).then(saved => {
+            const savedIndex = saved.list.map((news) => news._id.toString())
+                .indexOf(req.params.idN)
+            saved.list.splice(savedIndex, 1);
+            saved.save().then(() => {
+                res.json(saved.list)
+            }).catch(err => {
+                res.status(400).json('error: ' + err);
+            })
+        }).catch(
+            err => res.status(400).json('error: ' + err)
+        )
+    }
+)
+
+router.get('/getNewsSaved/:id', (req, res) => {
+        SavedNews.findOne({'user': req.params.id}, function (err, docs) {
+            if (docs) {
+                console.log('mawjoud');
+                res.json(docs.list)
+            } else {
+                console.log('mouch mawjoud');
+                res.send(null)
+            }
+        });
+    }
+);
 
 module.exports = router;
