@@ -44,7 +44,6 @@ router.post(
       const user = await User.findById(req.user.id).select("-password");
       const profile = await Profile.findOne({ user: user._id });
 
-
       const uploader = async (path) => await cloudinary.uploads(path, "Images");
       const urls = [];
       const files = req.files;
@@ -64,6 +63,7 @@ router.post(
         avatar: profile.avatar,
         name: profile.name,
         category: req.body.category,
+        location: req.body.location,
       });
       const post = await newPost.save();
       res.json(post);
