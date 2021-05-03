@@ -1605,7 +1605,7 @@ router.get("/most-viewed-people", auth, async (req, res) => {
         });
         let topList = [];
         for (let i = 0; i < 5; i++) {
-            topList.unshift(sortByView[i]);
+            topList.push(sortByView[i]);
         }
         res.json(topList);
     } catch (error) {
