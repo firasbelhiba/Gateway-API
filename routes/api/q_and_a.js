@@ -861,9 +861,24 @@ router.post('/addDomain/:id', (req, res) => {
 );
 
 router.get('/getDomains/:id', (req, res) => {
-        console.log(req.params.id)
+        const user = req.params.id;
+        const Domains = []
         Setting.findOne({'user': req.params.id}).then(setting => {
-            res.json(setting.domains)
+            console.log(setting)
+            if (setting === null) {
+                const newSetting = new Setting({
+                    user,
+                    Domains,
+                });
+                newSetting.save().then(() => {
+                    res.json(setting.domains)
+                }).catch(err => {
+                    res.status(400).json('error: ' + err)
+                });
+            } else {
+                console.log(setting)
+                res.json(setting.domains)
+            }
         })
     }
 );
