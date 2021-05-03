@@ -157,7 +157,7 @@ router.put(
         
         const newJob = new Job({
           _id : req.params.id,
-          user: user,
+          user: req.user.id,
           description,
           price,
           availability,
@@ -672,6 +672,42 @@ router.post("/mail/:id", auth, async (req, res) => {
       res.status(500).send("Server error");
     }
   });
+
+   //@author Iheb Laribi
+//@route POST api/posts/interview/:id
+//@desc send a post by email
+//@access Private
+router.post("/interview/:id", auth, async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+    const user = await User.findById(req.user.id).select("-password");
+    if (!job) {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+
+    
+
+    await transporter.sendMail({
+      to: [req.body.to,user.email],
+      from: "gatewayjustcode@gmail.com",
+      subject: req.body.subject ,
+      html: `<h1> Interview scheduled:</h1>
+      <h1> for the job posted at :${job.date} </h1>
+      <h1>title:${job.title}</h1>
+      <h2> Date : ${req.body.date}</p> 
+      <h2> Room number :${req.body.room}</h2>`,
+       
+    });
+
+    res.status(200).json({ message: "email sent with success !!" });
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Post not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
   
   router.post('/schedule', async (req, res) => {
     transporter.sendMail(options, (err, info) => {
