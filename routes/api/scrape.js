@@ -99,13 +99,7 @@ router.get("/get-scraped-data-stackoverflow", auth, async (req, res) => {
   }
 });
 
-//tanitjob
-const jobTitleFromJson = fs.readFileSync(
-  "././data/tanitjobs/tanitJobsTitle.json"
-);
-const locationAndCompanyFromJson = fs.readFileSync(
-  "././data/tanitjobs/locationAndCompany.json"
-);
+
 
 let jobTitlesTJ = [];
 let locationAndCompanyTJ = [];
@@ -167,8 +161,6 @@ router.get("/scrape-tanitjob", async (req, res) => {
 
     fs.writeFileSync("data/tanitjobs/TJLinks.json", JSON.stringify(links));
 
-    jobTitlesTJ = JSON.parse(jobTitleFromJson);
-    locationAndCompanyTJ = JSON.parse(locationAndCompanyFromJson);
 
     res.json(locationAndCompanyTJ);
   } catch (error) {
@@ -176,6 +168,24 @@ router.get("/scrape-tanitjob", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+//tanitjob
+const jobTitleFromJson = fs.readFileSync(
+  "././data/tanitjobs/tanitJobsTitle.json"
+);
+const locationAndCompanyFromJson = fs.readFileSync(
+  "././data/tanitjobs/locationAndCompany.json"
+);
+
+const tanitLinksFromJson = fs.readFileSync(
+  "././data/tanitjobs/TJLinks.json"
+);
+
+
+jobTitlesTJ = JSON.parse(jobTitleFromJson);
+locationAndCompanyTJ = JSON.parse(locationAndCompanyFromJson);
+linksTJ = JSON.parse(tanitLinksFromJson);
+
 
 //@author Ghada Khedri
 //@route GET api/scrape/get-scraped-data-tanitjob
@@ -203,7 +213,7 @@ router.get("/get-scraped-data-tanitjob", async (req, res) => {
         location: scrapeLocation[i],
       });
     }
-    res.json(jobTitlesTJ);
+    res.json(scrapeList);
   } catch (error) {
     console.error(error.message);
     res.status(500).send("Server error");
@@ -473,6 +483,9 @@ router.get("/scrape-freecourse", async (req, res) => {
 
     let freecourseImages = [];
     let freecourseTitle = [];
+    let freecourseDate = [];
+    let freecourseDescription = [];
+    let freecourseLinks = []
 
 
     $(".post-img").each((i, element) => {
@@ -483,14 +496,32 @@ router.get("/scrape-freecourse", async (req, res) => {
       freecourseTitle.push($(element).find("a").text());
     });
 
+    $(".entry-date").each((i, element) => {
+      freecourseDate.push($(element).text());
+    });
+
+    $(".post-excerpt").each((i, element) => {
+      freecourseDescription.push($(element).text());
+    });
+
+    $(".readmore").each((i, element) => {
+      freecourseLinks.push($(element).find("a").attr("href"));
+    });
+
 
     console.log("2");
 
 
 
+    fs.writeFileSync("data/freecourse/freecourseTitle.json", JSON.stringify(freecourseTitle));
+    fs.writeFileSync("data/freecourse/freecourseImages.json", JSON.stringify(freecourseImages));
+    fs.writeFileSync("data/freecourse/freecourseDescription.json", JSON.stringify(freecourseDescription));
+    fs.writeFileSync("data/freecourse/freecourseDate.json", JSON.stringify(freecourseDate));
+    fs.writeFileSync("data/freecourse/freecourseLinks.json", JSON.stringify(freecourseLinks));
 
 
-    res.json(freecourseTitle)
+
+    res.json({ message: "Scraped succefully ! " });
 
   } catch (error) {
     console.error(error.message);
@@ -498,6 +529,61 @@ router.get("/scrape-freecourse", async (req, res) => {
   }
 });
 
+
+//Freecourse
+const freecourseTitleJson = fs.readFileSync(
+  "././data/freecourse/freecourseTitle.json"
+);
+
+const freecourseImagesFromJson = fs.readFileSync(
+  "././data/freecourse/freecourseImages.json"
+);
+
+const freecourseDescriptionFromJson = fs.readFileSync(
+  "././data/freecourse/freecourseDescription.json"
+);
+
+const freecourseDateFromJson = fs.readFileSync(
+  "././data/freecourse/freecourseDate.json"
+);
+
+const freecourseLinksFromJson = fs.readFileSync(
+  "././data/freecourse/freecourseLinks.json"
+);
+
+
+//Freecourse 
+let freecourseTitleList = JSON.parse(freecourseTitleJson);
+let freecourseImagesList = JSON.parse(freecourseImagesFromJson);
+let freecourseDescriptionList = JSON.parse(freecourseDescriptionFromJson);
+let freecourseDateList = JSON.parse(freecourseDateFromJson);
+let freecourseLinksList = JSON.parse(freecourseLinksFromJson);
+
+// //@author Ghada Khedri
+// //@route GET api/scrape/get-scraped-data-indeed
+// //@desc scrape jobs
+// //@access Private
+router.get("/get-scraped-data-freecourse", async (req, res) => {
+  try {
+
+    let scrapeList = [];
+
+
+    for (let i = 0; i < 5; i++) {
+      scrapeList.push({
+        title: freecourseTitleList[i],
+        description: freecourseDescriptionList[i],
+        image: freecourseImagesList[i],
+        date: freecourseDateList[i],
+        link: freecourseLinksList[i],
+      });
+    }
+    res.json(scrapeList);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send("Server error");
+  }
+});
 
 
 module.exports = router;

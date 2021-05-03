@@ -48,7 +48,7 @@ router.post(
       const urls = [];
       const files = req.files;
       for (const file of files) {
-        const { paprofileth } = file;
+        const { path } = file;
         const newPath = await uploader(path);
         urls.push(newPath.url);
 
@@ -63,7 +63,7 @@ router.post(
         avatar: profile.avatar,
         name: profile.name,
         category: req.body.category,
-        location: req.body.location,
+        location: req.body.location
       });
       const post = await newPost.save();
       res.json(post);

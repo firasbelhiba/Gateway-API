@@ -287,6 +287,13 @@ router.post(
                     { $set: profileFields },
                     { new: true }
                 );
+                const newScore = {
+                    profile: profile._id,
+                    total_score: 0,
+                    level: 1,
+                }
+
+                await profile.score.unshift(newScore)
                 return res.json(profile);
             }
 
