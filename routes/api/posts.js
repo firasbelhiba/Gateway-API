@@ -63,7 +63,7 @@ router.post(
         avatar: profile.avatar,
         name: profile.name,
         category: req.body.category,
-        location: req.body.location
+        location: req.body.location,
       });
       const post = await newPost.save();
       res.json(post);
