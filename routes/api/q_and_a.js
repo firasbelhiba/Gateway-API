@@ -53,18 +53,28 @@ router.delete('/delete/:id', (req, res) => {
 
 //UpdateQuestion
 router.post('/update/:id', (req, res) => {
-        Question.findById(req.params.id).then(Question => {
-            Question.subject = req.body.subject;
-            Question.description = req.body.description;
-            Question.category = req.body.category;
-            Question.tags = req.body.tags;
-
-            Question.save().then(() => {
-                res.json('Question updated!');
+        Question.findById(req.params.id).then(q => {
+            q.subject = req.body.subject;
+            q.description = req.body.description;
+            q.category = req.body.category;
+            q.tags = req.body.tags;
+            console.log(req.body)
+            q.save().then(() => {
+                Question.find().then(Questions =>
+                    res.json(Questions)
+                ).catch(err => {
+                        console.log('1: ' + err)
+                        res.status(400).json('error: ' + err)
+                    }
+                );
             }).catch(err => {
+                console.log('2: ' + err)
                 res.status(400).json('error: ' + err);
             })
-        }).catch(err => res.status(400).json('error: ' + err));
+        }).catch(err => {
+            console.log('3: ' + err)
+            res.status(400).json('error: ' + err)
+        });
     }
 );
 
