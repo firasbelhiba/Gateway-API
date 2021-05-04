@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../../models/User");
 const Question = require("../../models/Question");
 const SavedNews = require("../../models/SavedNews");
+const Setting = require("../../models/Setting");
 const axios = require('axios');
 const config = require('config');
 const cheerio = require('cheerio');
@@ -52,18 +53,45 @@ router.delete('/delete/:id', (req, res) => {
 
 //UpdateQuestion
 router.post('/update/:id', (req, res) => {
-        Question.findById(req.params.id).then(Question => {
-            Question.subject = req.body.subject;
-            Question.description = req.body.description;
-            Question.category = req.body.category;
-            Question.tags = req.body.tags;
-
-            Question.save().then(() => {
-                res.json('Question updated!');
+        Question.findById(req.params.id).then(q => {
+            q.subject = req.body.subject;
+            q.description = req.body.description;
+            q.category = req.body.category;
+            q.tags = req.body.tags;
+            console.log(req.body)
+            q.save().then(() => {
+                Question.find().then(Questions =>
+                    res.json(Questions)
+                ).catch(err => {
+                        console.log('1: ' + err)
+                        res.status(400).json('error: ' + err)
+                    }
+                );
             }).catch(err => {
+                console.log('2: ' + err)
                 res.status(400).json('error: ' + err);
             })
-        }).catch(err => res.status(400).json('error: ' + err));
+        }).catch(err => {
+            console.log('3: ' + err)
+            res.status(400).json('error: ' + err)
+        });
+    }
+);
+
+router.post('/updateAnswer/:idQ/:idA', (req, res) => {
+        Question.findById(req.params.idQ).then(q => {
+            q.answers.find((answer) => answer.id === req.params.idA).description = req.body.description
+            //console.log(req.body.description)
+            q.save().then(() => {
+                    res.json(q)
+                }
+            ).catch(err => {
+                    res.status(400).json('error: ' + err)
+                }
+            )
+        }).catch(err => {
+            res.status(400).json('error: ' + err)
+        });
     }
 );
 
@@ -816,5 +844,87 @@ router.get('/getNewsSaved/:id', (req, res) => {
         });
     }
 );
+
+router.post('/addDomain/:id', (req, res) => {
+        const user = req.params.id;
+        const category = req.body.category;
+
+        const newDomain = {
+            category,
+        };
+        Setting.findOne({'user': user}, function (err, docs) {
+            if (docs) {
+                Setting.findOne({'user': user}).then(setting => {
+                        const domainIndex = setting.domains.map((domain) => domain.category.toString())
+                            .indexOf(category);
+                        console.log(domainIndex);
+                        if (domainIndex === -1) {
+                            setting.domains.push(newDomain);
+                            setting.save().then(() => {
+                                res.json(setting.domains)
+                            }).catch(err => {
+                                res.status(400).json('error: ' + err)
+                            })
+                        }
+                    }
+                )
+            } else {
+                const Domains = []
+                Domains.push({
+                    category
+                })
+                const setting = new Setting({
+                    user,
+                    Domains,
+                });
+                setting.save().then(() => {
+                    res.json(setting.domains)
+                }).catch(err => {
+                    res.status(400).json('error: ' + err)
+                });
+            }
+        });
+    }
+);
+
+router.get('/getDomains/:id', (req, res) => {
+        const user = req.params.id;
+        const Domains = []
+        Setting.findOne({'user': req.params.id}).then(setting => {
+            console.log(setting)
+            if (setting === null) {
+                const newSetting = new Setting({
+                    user,
+                    Domains,
+                });
+                newSetting.save().then(() => {
+                    res.json(setting.domains)
+                }).catch(err => {
+                    res.status(400).json('error: ' + err)
+                });
+            } else {
+                console.log(setting)
+                res.json(setting.domains)
+            }
+        })
+    }
+);
+
+router.post('/cancelDomains/:idU/:category', (req, res) => {
+        const user = req.params.idU;
+        Setting.findOne({'user': user}).then(setting => {
+            const settingIndex = setting.domains.map((domain) => domain.category.toString())
+                .indexOf(req.params.category)
+            setting.domains.splice(settingIndex, 1);
+            setting.save().then(() => {
+                res.json(setting.domains)
+            }).catch(err => {
+                res.status(400).json('error: ' + err);
+            })
+        }).catch(
+            err => res.status(400).json('error: ' + err)
+        )
+    }
+)
 
 module.exports = router;

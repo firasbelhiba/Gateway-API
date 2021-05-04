@@ -560,7 +560,7 @@ let freecourseDateList = JSON.parse(freecourseDateFromJson);
 let freecourseLinksList = JSON.parse(freecourseLinksFromJson);
 
 // //@author Ghada Khedri
-// //@route GET api/scrape/get-scraped-data-indeed
+// //@route GET api/scrape/get-scraped-freecourse
 // //@desc scrape jobs
 // //@access Private
 router.get("/get-scraped-data-freecourse", async (req, res) => {

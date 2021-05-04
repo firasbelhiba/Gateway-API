@@ -1,12 +1,7 @@
 {
-  "python": "python",
-  "spring": "spring",
-  "angular": "angular",
-  ".net": ".net",
   "Science, Technology, Engineering and Mathematics": "Science, Technology, Engineering and Mathematics",
   "Hospitality and Tourism": "Hospitality and Tourism",
   "Education and Training": "Education and Training",
-  "Agriculture, Food and Natural Resources" : "Agriculture, Food and Natural Resources",
-  "Architecture and Construction":"Architecture and Construction"
-
+  "Agriculture, Food and Natural Resources": "Agriculture, Food and Natural Resources",
+  "Architecture and Construction": "Architecture and Construction"
 }
