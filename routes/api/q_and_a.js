@@ -78,6 +78,23 @@ router.post('/update/:id', (req, res) => {
     }
 );
 
+router.post('/updateAnswer/:idQ/:idA', (req, res) => {
+        Question.findById(req.params.idQ).then(q => {
+            q.answers.find((answer) => answer.id === req.params.idA).description = req.body.description
+            //console.log(req.body.description)
+            q.save().then(() => {
+                    res.json(q)
+                }
+            ).catch(err => {
+                    res.status(400).json('error: ' + err)
+                }
+            )
+        }).catch(err => {
+            res.status(400).json('error: ' + err)
+        });
+    }
+);
+
 //AddQuestion
 router.post('/add', (req, res) => {
         const user = req.body.user
