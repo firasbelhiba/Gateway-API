@@ -9,6 +9,7 @@ const config = require('config');
 const cheerio = require('cheerio');
 const request = require('request');
 const googleNewsScraper = require('google-news-scraper')
+const Profile = require("../../models/Profile");
 
 
 //@author Motez Ayari
@@ -20,6 +21,50 @@ const googleNewsScraper = require('google-news-scraper')
 router.get('/', (req, res) => {
         Question.find().then(Questions => res.json(Questions))
             .catch(err => res.status(400).json('error: ' + err));
+    }
+);
+
+router.get('/getSettings', (req, res) => {
+        Setting.find().then(Settings => {
+            console.log(Settings)
+            res.json(Settings)
+        }).catch(err => res.status(400).json('error: ' + err));
+    }
+);
+router.get('/getBlock/:id', (req, res) => {
+        Setting.findOne({'user': req.params.id}).then(setting => {
+            console.log(setting)
+            const question = setting.block.types.question < new Date()
+            const answer = setting.block.types.answer < new Date()
+            const reply = setting.block.types.reply < new Date()
+
+            const block = {
+                question,
+                answer,
+                reply
+            }
+            console.log(block)
+            res.json(block)
+        }).catch(err => res.status(400).json('error: ' + err));
+    }
+);
+
+
+router.get('/usersQA', (req, res) => {
+        Setting.find().then(async settings => {
+            try {
+                const promises = settings.map(async (setting) => {
+                    const p = await Profile.findOne({
+                        user: setting.user,
+                    }).populate("user", ["name", "avatar"]);
+                    return p;
+                })
+                const profiles = await Promise.all(promises)
+                res.json(profiles)
+            } catch (error) {
+                res.status(400).json('error: ' + error)
+            }
+        }).catch(err => res.status(400).json('error: ' + err));
     }
 );
 
@@ -926,5 +971,69 @@ router.post('/cancelDomains/:idU/:category', (req, res) => {
         )
     }
 )
+
+router.post('/addBloc/:id', (req, res) => {
+        const user = req.params.id;
+        const type = req.body.type;
+
+        var date = new Date();
+        date.setDate(date.getDate() + req.body.d);
+
+        Setting.findOne({'user': user}, function (err, docs) {
+            if (docs) {
+                Setting.findOne({'user': user}).then(setting => {
+                        if (type === 'question') {
+                            setting.block.types.question = date;
+                        } else if (type === 'answer') {
+                            setting.block.types.answer = date;
+                        } else if (type === 'reply') {
+                            setting.block.types.reply = date;
+                        } else {
+                            setting.block.types.reply = date;
+                            setting.block.types.answer = date;
+                            setting.block.types.question = date;
+                        }
+                        setting.save().then(
+                            Setting.find().then(Settings => {
+                                res.json(Settings)
+                            }).catch(err => res.status(400).json('error: ' + err))
+                        ).catch(err => res.status(400).json('error: ' + err))
+                    }
+                )
+            } else {
+                res.status(400).json('error: ' + err)
+            }
+        });
+    }
+);
+
+router.post('/cancelBlock/:id/:type', (req, res) => {
+        const user = req.params.id;
+        const type = req.params.type;
+
+        var date = new Date();
+
+        Setting.findOne({'user': user}, function (err, docs) {
+            if (docs) {
+                Setting.findOne({'user': user}).then(setting => {
+                        if (type === 'question') {
+                            setting.block.types.question = date;
+                        } else if (type === 'answer') {
+                            setting.block.types.answer = date;
+                        } else if (type === 'reply') {
+                            setting.block.types.reply = date;
+                        }
+                        setting.save().then(
+                            console.log(setting.block.types)
+                            //res.json(setting.block.types)
+                        ).catch(err => res.status(400).json('error: ' + err))
+                    }
+                )
+            } else {
+                res.status(400).json('error: ' + err)
+            }
+        });
+    }
+);
 
 module.exports = router;

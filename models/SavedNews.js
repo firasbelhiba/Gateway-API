@@ -3,7 +3,8 @@ const Schema = mongoose.Schema;
 
 const SavedNewsSchema = new Schema({
     user: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
     },
     list: [
         {
