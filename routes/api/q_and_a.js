@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require("../../models/User");
 const Question = require("../../models/Question");
 const SavedNews = require("../../models/SavedNews");
+const QADomain = require("../../models/QADomain");
 const Setting = require("../../models/Setting");
 const axios = require('axios');
 const config = require('config');
@@ -29,6 +30,29 @@ router.get('/getSettings', (req, res) => {
             console.log(Settings)
             res.json(Settings)
         }).catch(err => res.status(400).json('error: ' + err));
+    }
+);
+
+router.get('/getScores', (req, res) => {
+        Setting.find().then(Settings => {
+            var settings = []
+            for (var i in Settings) {
+                const user = Settings[i].user
+                const score = Settings[i].score
+                settings.push({user, score})
+            }
+            res.json(settings)
+        }).catch(err => res.status(400).json('error: ' + err));
+    }
+);
+
+router.get('/getALLDomains', (req, res) => {
+        QADomain.find().then(Domains => {
+            console.log(Domains)
+            res.json(Domains)
+        }).catch(err =>
+            res.status(400).json('error: ' + err)
+        );
     }
 );
 router.get('/getBlock/:id', (req, res) => {
@@ -96,6 +120,18 @@ router.delete('/delete/:id', (req, res) => {
     }
 );
 
+router.delete('/DeleteDomains/:id', (req, res) => {
+        QADomain.findByIdAndDelete(req.params.id).then(
+            QADomain.find().then(Domains => {
+                console.log(Domains)
+                res.json(Domains)
+            },)
+                .catch(err =>
+                    res.status(400).json('error: ' + err)
+                )
+                .catch(err => res.status(400).json('error: ' + err)));
+    }
+);
 //UpdateQuestion
 router.post('/update/:id', (req, res) => {
         Question.findById(req.params.id).then(q => {
@@ -107,6 +143,30 @@ router.post('/update/:id', (req, res) => {
             q.save().then(() => {
                 Question.find().then(Questions =>
                     res.json(Questions)
+                ).catch(err => {
+                        console.log('1: ' + err)
+                        res.status(400).json('error: ' + err)
+                    }
+                );
+            }).catch(err => {
+                console.log('2: ' + err)
+                res.status(400).json('error: ' + err);
+            })
+        }).catch(err => {
+            console.log('3: ' + err)
+            res.status(400).json('error: ' + err)
+        });
+    }
+);
+
+router.post('/UpdateDomains/:id', (req, res) => {
+        QADomain.findById(req.params.id).then(domain => {
+            domain.name = req.body.name;
+            domain.icon = req.body.icon;
+            console.log(req.body)
+            domain.save().then(() => {
+                QADomain.find().then(Domains =>
+                    res.json(Domains)
                 ).catch(err => {
                         console.log('1: ' + err)
                         res.status(400).json('error: ' + err)
@@ -211,9 +271,95 @@ router.post('/:idQ/reply/:idA', (req, res) => {
 router.post('/:idQ/solve/:idA', (req, res) => {
         Question.findById(req.params.idQ).then(Question => {
             Question.solved = !Question.solved;
+            const answerOwner = Question.answers.find((answer) => answer.id === req.params.idA).user
+            const name = Question.category
+            const tags = Question.tags
+            const categories = []
+
             Question.answers.find((answer) => answer.id === req.params.idA).solution
                 = !Question.answers.find((answer) => answer.id === req.params.idA).solution;
 
+            Setting.findOne({'user': answerOwner}, function (err, docs) {
+                if (docs.score.length) {
+                    Setting.findOne({'user': answerOwner}).then(setting => {
+                            const domainIndex = setting.score.map((score) => score.domain.name.toString())
+                                .indexOf(name);
+                            console.log(domainIndex);
+                            if (domainIndex === -1) {
+                                for (var i in tags) {
+                                    const type = tags[i].toString()
+                                    const score = 50
+                                    const category = {
+                                        type,
+                                        score
+                                    }
+                                    categories.push(category)
+                                }
+                                const newScore = {
+                                    domain: {
+                                        name,
+                                        categories
+                                    }
+                                }
+                                setting.score.push(newScore);
+                            } else {
+                                var types = []
+                                for (var i in setting.score[domainIndex].domain.categories) {
+                                    types.push(setting.score[domainIndex].domain.categories[i].type)
+                                }
+                                console.log(types)
+                                for (var j in tags) {
+                                    if (types.includes(tags[j])) {
+                                        for (var i in setting.score[domainIndex].domain.categories) {
+                                            if (tags[j] === setting.score[domainIndex].domain.categories[i].type) {
+                                                setting.score[domainIndex].domain.categories[i].score =
+                                                    setting.score[domainIndex].domain.categories[i].score + 50;
+                                            }
+                                        }
+                                    } else {
+                                        const type = tags[j].toString()
+                                        const score = 50
+                                        const category = {
+                                            type,
+                                            score
+                                        }
+                                        setting.score[domainIndex].domain.categories.push(category);
+                                        console.log(setting.score[domainIndex].domain.categories)
+
+                                    }
+                                }
+                            }
+                            setting.save().then(() =>
+                                console.log('saved')
+                            ).catch((err) => console.log('problemo: ' + err))
+                        }
+                    )
+                } else {
+                    console.log('doesnt exist')
+                    for (var i in tags) {
+                        const type = tags[i].toString()
+                        const score = 50
+                        const category = {
+                            type,
+                            score
+                        }
+                        categories.push(category)
+                    }
+                    const newScore = {
+                        domain: {
+                            name,
+                            categories
+                        }
+                    }
+                    console.log(newScore)
+                    Setting.findOne({'user': answerOwner}).then(setting => {
+                        setting.score.push(newScore);
+                        setting.save().then(() =>
+                            console.log('saved')
+                        ).catch((err) => console.log('problemo: ' + err))
+                    })
+                }
+            });
             Question.save().then(() => {
                 res.json(Question);
             }).catch(err => {
@@ -271,7 +417,6 @@ router.post('/:idQ/downVote/:idU', (req, res) => {
             const vote = {
                 user: req.params.idU,
             }
-
             var DownVote = [];
             for (var i in Question.downVotes)
                 DownVote.push(Question.downVotes[i].user.toString());
@@ -664,18 +809,7 @@ router.get('/sortQuestions/:sort', (req, res) => {
 
 router.get('/filterQuestions/:tag', (req, res) => {
         Question.find().then(Questions => {
-            if (req.params.tag === 'html') {
-                res.json(Questions.filter(q => q.tags.includes('html')));
-            }
-            if (req.params.tag === 'css') {
-                res.json(Questions.filter(q => q.tags.includes('css')));
-            }
-            if (req.params.tag === 'javascript') {
-                res.json(Questions.filter(q => q.tags.includes('javascript')));
-            }
-            if (req.params.tag === 'php') {
-                res.json(Questions.filter(q => q.tags.includes('php')));
-            }
+                res.json(Questions.filter(q => q.tags.includes(req.params.tag.toLowerCase())));
         }).catch(err => res.status(400).json('error: ' + err));
     }
 );
@@ -700,6 +834,7 @@ router.post('/:idQ/followQuestion/:idU', (req, res) => {
             Question.following.push(follow);
 
             Question.save().then(() => {
+                console.log('added to follow')
                 Question.find().then(Questions => res.json(Questions))
             }).catch(err => {
                 res.status(400).json('error: ' + err);
@@ -797,7 +932,7 @@ router.get('/newsRecSkills/:search', async (req, res) => {
         const articles = await googleNewsScraper({
             searchTerm: req.params.search,
             prettyURLs: true,
-            timeframe: "3d",
+            timeframe: "1d",
             timeout: 0,
             puppeteerArgs: [
                 '--no-sandbox',
@@ -1033,6 +1168,31 @@ router.post('/cancelBlock/:id/:type', (req, res) => {
                 res.status(400).json('error: ' + err)
             }
         });
+    }
+);
+
+router.post('/addDomainType', (req, res) => {
+        const name = req.body.name;
+        const icon = req.body.icon;
+        const tags = req.body.Tags
+
+        const newDomain = new QADomain({
+            name,
+            icon,
+            tags
+        });
+
+        newDomain.save().then(() => {
+            console.log('fesfes')
+            QADomain.find().then(Domains => {
+                console.log(Domains)
+                res.json(Domains)
+            }).catch(err =>
+                res.status(400).json('error: ' + err)
+            );
+        }).catch(err => {
+            res.status(400).json('error: ' + err);
+        })
     }
 );
 

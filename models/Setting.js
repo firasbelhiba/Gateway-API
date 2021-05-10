@@ -13,6 +13,25 @@ const SettingSchema = new Schema({
             },
         },
     ],
+    score: [
+        {
+            domain: {
+                name: {
+                    type: String
+                },
+                categories: [
+                    {
+                        type: {
+                            type: String,
+                        },
+                        score: {
+                            type: Number
+                        },
+                    },
+                ],
+            },
+        },
+    ],
     block: {
         types: {
             question: {
