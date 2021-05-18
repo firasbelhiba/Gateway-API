@@ -201,7 +201,7 @@ router.put("/unlike/:id", auth, async (req, res) => {
   }
 });
 
-//@author Ghada Khedri
+//@author Ghada Khedri 25759561 /155381
 //@route POST api/posts/comment/:id
 //@desc comment a post
 //@access Private

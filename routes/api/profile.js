@@ -178,6 +178,13 @@ router.post("/linkedin", [
             profile.education.unshift(newEducation);
         }
 
+        const newScore = {
+            profile: profile._id,
+            total_score: 0,
+            level: 1,
+        }
+
+        await profile.score.unshift(newScore)
         await profile.save();
 
         res.json(profile);
