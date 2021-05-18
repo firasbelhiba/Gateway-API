@@ -1,4 +1,8 @@
-{
+{  
+  "python": "python",
+  "spring": "spring",
+  "angular": "angular",
+  ".net": ".net",
   "Science, Technology, Engineering and Mathematics": "Science, Technology, Engineering and Mathematics",
   "Hospitality and Tourism": "Hospitality and Tourism",
   "Education and Training": "Education and Training",
