@@ -168,6 +168,14 @@ router.post(
           newEducation.degree = linkedinData.education[i].degreeName;
         }
 
+        const newScore = {
+          profile: profile._id,
+          total_score: 0,
+          level: 1,
+        }
+
+        await profile.score.unshift(newScore)
+        await profile.save();
         newEducation.from = linkedinData.education[i].startDate;
         newEducation.to = linkedinData.education[i].endDate;
         profile.education.unshift(newEducation);
@@ -978,11 +986,10 @@ router.get("/github/:username", async (req, res) => {
   try {
     // This is only to show  repositories , if you want to show more or less just change the per_page parameters in the uri
     const options = {
-      uri: `https://api.github.com/users/${
-        req.params.username
-      }/repos?per_page=5&sort=created:asc&client_id=${config.get(
-        "githubClientId"
-      )}&client_secret=${config.get("githubSecret")}`,
+      uri: `https://api.github.com/users/${req.params.username
+        }/repos?per_page=5&sort=created:asc&client_id=${config.get(
+          "githubClientId"
+        )}&client_secret=${config.get("githubSecret")}`,
       method: "GET",
       headers: { "user-agent": "node.js" },
     };
