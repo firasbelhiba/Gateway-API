@@ -3,7 +3,8 @@ const Schema = mongoose.Schema;
 
 const SettingSchema = new Schema({
     user: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
     },
     domains: [
         {
@@ -11,7 +12,42 @@ const SettingSchema = new Schema({
                 type: String,
             },
         },
-    ]
+    ],
+    score: [
+        {
+            domain: {
+                name: {
+                    type: String
+                },
+                categories: [
+                    {
+                        type: {
+                            type: String,
+                        },
+                        score: {
+                            type: Number
+                        },
+                    },
+                ],
+            },
+        },
+    ],
+    block: {
+        types: {
+            question: {
+                type: Date,
+                default: Date.now,
+            },
+            answer: {
+                type: Date,
+                default: Date.now,
+            },
+            reply: {
+                type: Date,
+                default: Date.now,
+            },
+        },
+    }
 });
 
 module.exports = Setting = mongoose.model("setting", SettingSchema);

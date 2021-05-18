@@ -63,7 +63,7 @@ router.post(
         avatar: profile.avatar,
         name: profile.name,
         category: req.body.category,
-        location: req.body.location
+        location: req.body.location,
       });
       const post = await newPost.save();
       res.json(post);
@@ -143,6 +143,8 @@ router.delete("/:id", auth, async (req, res) => {
 router.put("/like/:id", auth, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
+    const user = await User.findById(req.user.id).select("-password");
+    const profile = await Profile.findOne({ user: user._id });
 
     //Check if the post is already liked by the user
     if (
@@ -153,8 +155,8 @@ router.put("/like/:id", auth, async (req, res) => {
     }
     post.likes.unshift({
       user: req.user.id,
-      name: post.name,
-      avatar: post.avatar,
+      name: profile.name,
+      avatar: profile.avatar,
     });
     await post.save();
     res.json(post.likes);

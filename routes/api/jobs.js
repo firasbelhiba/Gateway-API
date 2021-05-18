@@ -130,6 +130,26 @@ router.delete("/:id", auth, async (req, res) => {
       res.status(500).send("Server error");
     }
   });
+
+  //@author iHEB Laribi
+//@route DELETE api/jobs/admin/:id
+//@desc DELETE by id job
+//@access Private
+
+router.delete("/admin/:id", async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id);
+
+    await job.remove();
+    res.json({ message: "Job Deleted" });
+  } catch (error) {
+    console.error(error.message);
+    if (error.kind === "ObjectId") {
+      return res.status(404).json({ message: "Job not Found " });
+    }
+    res.status(500).send("Server error");
+  }
+});
   
   //@author Iheb Laribi
 //@route UPDATE api/jobs/:id
